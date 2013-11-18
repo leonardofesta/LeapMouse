@@ -1,0 +1,9 @@
+TestResult
+*.suo
+*.dll
+bin
+obj
+*.psess
+*.vspx
+StreamGroupBy
+Covariance
