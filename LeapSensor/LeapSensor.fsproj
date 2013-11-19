@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="LeapCSharp.NET4.0">
-      <HintPath>..\LeapMouse\lib\LeapCSharp.NET4.0.dll</HintPath>
+      <HintPath>..\..\..\..\..\Documents\Visual Studio 2012\Projects\LeapMouse\LeapMouse\lib\LeapCSharp.NET4.0.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

@@ -1,9 +1,9 @@
-﻿module GestIT.Events
+﻿module BufferData.Events
 
 open System.Collections.Generic
-open GestIT.IData
-open GestIT.Data
-open GestIT.TData
+open BufferData.IData
+open BufferData.Data
+open BufferData.TData
 
 // The f function will raise the T event if needed
 type TEvent<'X,'V> (triggerfun : 'V -> bool, ?active: bool, ?name:string)=

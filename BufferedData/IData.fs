@@ -1,4 +1,4 @@
-﻿module GestIT.IData
+﻿module BufferData.IData
 
 
 type Data =

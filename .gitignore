@@ -3,6 +3,7 @@ TestResult
 *.dll
 bin
 obj
+lib
 *.psess
 *.vspx
 StreamGroupBy

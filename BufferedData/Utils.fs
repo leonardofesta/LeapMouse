@@ -1,8 +1,8 @@
-﻿module GestIT.Utils
+﻿module BufferData.Utils
 
 
 open System
-open GestIT.IData
+open BufferData.IData
 
 open System.Collections.Generic
 open MathNet.Numerics.LinearAlgebra
