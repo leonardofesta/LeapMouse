@@ -26,7 +26,12 @@
                 lbl.Font <- new Font("Verdana", 10.F)
                 lbl.Text <- "* Simple Frame *"
                 btn.Text <- "Inizia"
-                btn.Click.Add(fun e -> System.Console.WriteLine("cane"))
+                btn.Click.Add(fun e -> System.Console.WriteLine("cane")
+                                       let desktopH = System.Windows.Forms.SystemInformation.VirtualScreen.Height
+                                       let desktopW = System.Windows.Forms.SystemInformation.VirtualScreen.Width
+                                       System.Console.WriteLine("Altezza = " + desktopH.ToString() + "\nLarghezza = " + desktopW.ToString())
+                                       System.Console.WriteLine("Posizione mouse = " + System.Windows.Forms.Cursor.Position.ToString())
+                             )
                 let t = new TableLayoutPanel()
                 t.Controls.Add(lbl)
                 t.Controls.Add(btn)

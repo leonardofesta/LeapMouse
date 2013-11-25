@@ -30,6 +30,11 @@ type Acc1D() =
     let mutable variance = -1.0
     let mutable x2 = 0.0 // sarebbe x^2
     let mutable stdev = -1.0
+
+
+    override this.AddItem(d,filter) = 
+            if ( filter d ) then this.AddItem(d)
+
     
     override this.AddItem(d) = 
             avg <- media(sum,items,d.D1)
@@ -41,7 +46,7 @@ type Acc1D() =
 
 
     interface Accumulator<Data1D> with
-
+        
         member this.AddItem( d ) = 
             this.AddItem(d)
         
@@ -89,6 +94,11 @@ type Acc2D() =
     
     let mutable stdev1 = -1.0
     let mutable stdev2 = -1.0
+
+    override this.AddItem(d,filter) = 
+            if ( filter d ) then this.AddItem(d)
+
+    
 
 
     override x.AddItem( d ) =
@@ -171,7 +181,8 @@ type Acc3D() =
     let mutable stdev2 = -1.0
     let mutable stdev3 = -1.0
 
-    
+    override this.AddItem(d,filter) = 
+            if ( filter d ) then this.AddItem(d)    
 
     override x.AddItem(d:Data3D) =
             

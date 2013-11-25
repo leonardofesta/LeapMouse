@@ -11,7 +11,7 @@ let periodoeventi(buffer,timespan) =         let bb = ((buffer:Buffered2D).cutBu
                                                     let intervallo = ultimo.Time.Subtract(primo.Time)
                                                     
                                                     intervallo.TotalMilliseconds > timespan // vero se il confronto è su dati di almeno tot timespan
-                                                    else 
+                                                else 
                                                     false
 
 let stationary(timespan,toll) = fun buffer ->  let bb = (buffer:Buffered2D)

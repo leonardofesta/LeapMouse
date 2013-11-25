@@ -80,4 +80,5 @@ type TData3D =
 [<AbstractClass>]
 type BufferedData<'T>() =
     inherit System.EventArgs() 
+    abstract member AddItem: 'T*('T->bool) -> unit
     abstract member AddItem: 'T -> unit

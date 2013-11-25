@@ -63,6 +63,8 @@ type Buffered1D (?item:List<TData1D>, ?soglia:float) =
 
     member this.GetListBuffer() = Seq.toList(itemlist)
 
+    override this.AddItem(d:TData1D, filter:TData1D->bool) = 
+        if (filter d) then itemlist.Add(d)
     
     override this.AddItem(d:TData1D) = 
         itemlist.Add (d)
@@ -341,6 +343,9 @@ type Buffered2D (?item:List<TData2D>, ?soglia:float) =
     member this.GetArrayBuffer() = Seq.toArray(itemlist)
 
     member this.GetListBuffer() = Seq.toList(itemlist)
+
+    override this.AddItem(d:TData2D, filter:TData2D->bool) = 
+        if (filter d) then itemlist.Add(d)
 
 
     override this.AddItem(d:TData2D) = 
@@ -635,6 +640,9 @@ type Buffered3D (?item:List<TData3D>, ?soglia:float) =
     member this.GetArrayBuffer() = Seq.toArray(itemlist)
 
     member this.GetListBuffer() = Seq.toList(itemlist)
+
+    override this.AddItem(d:TData3D, filter:TData3D->bool) = 
+        if (filter d) then itemlist.Add(d)
 
     override this.AddItem(d:TData3D) =
             itemlist.Add  (d)

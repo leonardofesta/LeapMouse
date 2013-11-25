@@ -38,3 +38,6 @@ open BufferData.IData
                 | Stabile = 0
                 | NewHand = 1
                 | NewFinger = 2
+                | Moving = 3
+                | CalibrationFinger = 4
+                | Stabile2 = 5

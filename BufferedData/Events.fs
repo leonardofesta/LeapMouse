@@ -50,6 +50,9 @@ type EventBuffer<'T,'W> when 'T :> BufferedData<'W> and 'W :> Data (data:'T)  =
     
     member this.addEvent(t:TEvent<_,_>) = eventlist.Add(t)
 
+    member this.AddItem(d:'W,filter:'W -> bool) = 
+        data.AddItem(d,filter)
+
     member this.AddItem(d:'W) =
         data.AddItem(d)  
     
