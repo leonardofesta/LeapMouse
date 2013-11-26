@@ -2,7 +2,7 @@
 
 open BufferData.TData
 
-let periodoeventi(buffer,timespan) =         let bb = ((buffer:Buffered2D).cutBuffer(timespan+1000.0))
+let periodoeventi(buffer,timespan) =         let bb = ((buffer:Buffered2D<_>).cutBuffer(timespan+1000.0))
                                              if (bb.Count() > 1)
                                                 then
                                                     let lista  = bb.GetListBuffer()
@@ -14,5 +14,5 @@ let periodoeventi(buffer,timespan) =         let bb = ((buffer:Buffered2D).cutBu
                                                 else 
                                                     false
 
-let stationary(timespan,toll) = fun buffer ->  let bb = (buffer:Buffered2D)
+let stationary(timespan,toll) = fun buffer ->  let bb = (buffer:Buffered2D<_>)
                                                bb.StationaryPosition(timespan,toll) && periodoeventi(bb,timespan)

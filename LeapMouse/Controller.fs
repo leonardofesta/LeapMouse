@@ -14,21 +14,31 @@ type LMController(app:TrayApplication) =
     let mutable bottom = 1.0
     let mutable LeapH  = 599.0
     let mutable LeapW  = 600.0
+    let mutable modifyTL = true
+    let mutable modifyBR = true
 
     let desktopH = System.Windows.Forms.SystemInformation.VirtualScreen.Height
     let desktopW = System.Windows.Forms.SystemInformation.VirtualScreen.Width
 
     member this.setmouseTopLeft(xvar:float,yvar:float) = 
-        if (left = 0.0) then
+        if (modifyTL) then
             left<- xvar
             top <- yvar
+            modifyTL <- false
     
     member this.setmouseBottomRight(xvar:float,yvar:float) = 
-        if (right = 0.0) then
-            right  <- xvar
-            bottom <- yvar
-            LeapH <- Math.Abs(right - left)
-            LeapW <- Math.Abs(top - bottom)
+            if (modifyBR) then
+                right  <- xvar
+                bottom <- yvar
+                LeapH <- Math.Abs(right - left)
+                LeapW <- Math.Abs(top - bottom)
+                modifyBR<- false
+
+
+    member this.Modify(b:bool) = 
+        modifyTL <- b
+        modifyBR <- b
+
 
     member this.movemouse(xvar:float,yvar:float) = 
         // fai il movimento del mouse facendo il rapporto e spostandolo

@@ -9,11 +9,6 @@ open MathNet.Numerics.LinearAlgebra.Double
 open MathNet.Numerics.Distributions
 open MathNet.Numerics.IntegralTransforms
 open MathNet.Numerics.IntegralTransforms.Algorithms
-                                    
-type Direction1D =
-        |  Positive = 1
-        |  Negative = -1
-        |  Casual = 0
 
 type Direction2D = 
         |   Casual = 0
@@ -27,32 +22,30 @@ type Direction2D =
         |   TopLeft = 8
 
 type TimespanData(timespan:float,x:float,?y:float,?z:float) = 
+
            member this.D1:float = x
+
            member this.D2:float = match y with
                                         | Some t->t
                                         | None -> -1.0
+
            member this.D3:float = match z with
                                         | Some t->t
                                         | None -> -1.0
-           member this.Time:float = timespan
 
-type FunzioneDir = 
-        |   Under = 0
-        |   Attraversa = 1
-        |   Over = 2
-        
+           member this.Time:float = timespan        
 
 
 
-type Buffered1D (?item:List<TData1D>, ?soglia:float) =
-    inherit BufferedData<TData1D>()
+type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
+    inherit BufferedData<TData1D<'T>>()
 
     let threshold = match soglia with
                             | None -> 10000.0
                             | Some h -> h
     
     let  itemlist = match item with
-                            | None -> new List<TData1D>()
+                            | None -> new List<TData1D<'T>>()
                             | Some h -> h
   
     member this.Count () = itemlist.Count    
@@ -63,10 +56,10 @@ type Buffered1D (?item:List<TData1D>, ?soglia:float) =
 
     member this.GetListBuffer() = Seq.toList(itemlist)
 
-    override this.AddItem(d:TData1D, filter:TData1D->bool) = 
+    override this.AddItem(d:TData1D<'T>, filter:TData1D<'T>->bool) = 
         if (filter d) then itemlist.Add(d)
     
-    override this.AddItem(d:TData1D) = 
+    override this.AddItem(d:TData1D<'T>) = 
         itemlist.Add (d)
         System.Console.WriteLine("Elemento aggiunto " + d.D1.ToString() + "  con tempo  " + d.Time.ToString())
 #if Reading
@@ -81,9 +74,9 @@ type Buffered1D (?item:List<TData1D>, ?soglia:float) =
     ///</summary>
     ///<param name="millisec"> la porzione di tempo da tenere a partire dall'istante attuale, in millisecondi </param>
     ///<returns>un oggetto Buffereed1D</returns>    
-    member this.cutBuffer(millisec:float):Buffered1D = 
+    member this.cutBuffer(millisec:float):Buffered1D<'U> = 
             let newlist = listcut(itemlist,millisec)
-            new Buffered1D(new List<TData1D> ( newlist))
+            new Buffered1D<'T>(new List<TData1D<'T>> ( newlist))
 
 
 
@@ -146,32 +139,6 @@ type Buffered1D (?item:List<TData1D>, ?soglia:float) =
 
 
 
-    // FORSE INUTILE
-    ///<summary>
-    ///Da la direzione positiva o negativa se la lista di eventi a partire da un determinato timespan è consistente verso una direzione, 
-    ///altrimenti restituisce direzione casuale
-    ///</summary>
-    ///<param name="timespan">rappresenta la dimensione di tempo per cui controllare (millisecondi) </param>
-    ///<param name="tolleranza">tolleranza nelle possibilità di insuccesso, float 0<x<1 in caso di assenza non si prevede tolleranza</param>
-    ///<returns>la velocità istantanea oppure 0 se non ci sono 2 elementi necessari</returns>
-    member this.Direction ( timespan : float, ?tolleranza:float) = 
-            let last = itemlist.Item(itemlist.Count - 1)
-            let newlist = listcut (itemlist,timespan)
-
-            let positivelist = List.filter(fun x -> (x:TData1D).D1<= last.D1 ) newlist
-            let negativelist = List.filter(fun x -> (x:TData1D).D1>= last.D1 ) newlist
-            let mutable toll = 1.0
-
-            match tolleranza with 
-                | None -> toll<- 1.0
-                | Some s -> toll <- s
-
-            if ( float( positivelist.Length ) > (toll * (float (newlist.Length))))
-                then Direction1D.Positive
-                elif ( float (negativelist.Length) > (toll* float( newlist.Length)))
-                then Direction1D.Negative
-                else Direction1D.Casual
-
 
     ///<summary>
     ///Calcola la posizione media del punto dato un timespan e ritorna il valore
@@ -186,7 +153,7 @@ type Buffered1D (?item:List<TData1D>, ?soglia:float) =
                     Double.NaN
                 else 
                     lista
-                    |> List.map(fun x -> (x:TData1D).D1)
+                    |> List.map(fun x -> (x:TData1D<'T>).D1)
                     |> List.average 
 
 
@@ -199,7 +166,7 @@ type Buffered1D (?item:List<TData1D>, ?soglia:float) =
     member this.StationaryPosition(timespan : float, tolleranza:float) = 
             let newlist = listcut(itemlist,timespan)
             let center = this.AveragePosition(timespan)
-            let result = List.forall(fun x -> StaticPoint((x:TData1D).D1,center,tolleranza  )) newlist
+            let result = List.forall(fun x -> StaticPoint((x:TData1D<'T>).D1,center,tolleranza  )) newlist
 
             result
 
@@ -213,9 +180,9 @@ type Buffered1D (?item:List<TData1D>, ?soglia:float) =
     ///</summary>
     ///<return>float x float</returns>
     member this.FittingToLine():float*float =
-        let ArrayX = Seq.toArray ( Seq.map(fun x -> (x:TData1D).D1) itemlist)
+        let ArrayX = Seq.toArray ( Seq.map(fun x -> (x:TData1D<'T>).D1) itemlist)
         let firsttime = itemlist.Item(0).Time
-        let arrayTime = Seq.toArray ( Seq.map(fun x -> timespanmilliseconds((x:TData1D).Time , firsttime)) itemlist)
+        let arrayTime = Seq.toArray ( Seq.map(fun x -> timespanmilliseconds((x:TData1D<'T>).Time , firsttime)) itemlist)
 
         linearRegression(ArrayX,arrayTime)
 (*
@@ -233,9 +200,9 @@ type Buffered1D (?item:List<TData1D>, ?soglia:float) =
     member this.FittingToLine(timespan : float):float*float = 
 
         let listacorta = listcut (itemlist, timespan)
-        let ArrayX = Seq.toArray ( Seq.map(fun x -> (x:TData1D).D1) listacorta)
+        let ArrayX = Seq.toArray ( Seq.map(fun x -> (x:TData1D<'T>).D1) listacorta)
         let firsttime = listacorta.Item(0).Time
-        let arrayTime = Seq.toArray ( Seq.map( fun x -> timespanseconds((x:TData1D).Time , firsttime)) listacorta)
+        let arrayTime = Seq.toArray ( Seq.map( fun x -> timespanseconds((x:TData1D<'T>).Time , firsttime)) listacorta)
 
         linearRegression(ArrayX,arrayTime)
 (*
@@ -256,7 +223,7 @@ type Buffered1D (?item:List<TData1D>, ?soglia:float) =
         let vnoto,coeff = this.FittingToLine(timespan)
         let listacorta = listcut (itemlist,timespan)
         let firsttime = listacorta.Head.Time
-        let arrayTimed = List.map (fun x -> new TimespanData(timespanseconds((x:TData1D).Time , firsttime),(x:TData1D).D1)) listacorta
+        let arrayTimed = List.map (fun x -> new TimespanData(timespanseconds((x:TData1D<'T>).Time , firsttime),(x:TData1D<'T>).D1)) listacorta
  
         let result = 
             arrayTimed
@@ -271,9 +238,9 @@ type Buffered1D (?item:List<TData1D>, ?soglia:float) =
     ///<summary>
     ///Fa sampling sull'input restituendo un nuovo oggetto BufferedData 
     ///</summary>
-    member this.Sample(funzione:(TData1D -> bool)) = 
-        let data  = new List<TData1D> ( Seq.filter(funzione) itemlist )
-        new Buffered1D(data ,threshold)
+    member this.Sample(funzione:(TData1D<'T> -> bool)) = 
+        let data  = new List<TData1D<'T>> ( Seq.filter(funzione) itemlist )
+        new Buffered1D<'T>(data ,threshold)
 
     ///<summary>
     ///<param name=funzione> funzione per calcolare i valori da seguire (rispetto al tempo, float tempo --> timespan data)
@@ -284,7 +251,7 @@ type Buffered1D (?item:List<TData1D>, ?soglia:float) =
  
         let listatagliata = listcut (itemlist,timespan)
         let primo = listatagliata.Head.Time
-        let listatimeshift = List.map (fun x -> let bb = x:TData1D
+        let listatimeshift = List.map (fun x -> let bb = x:TData1D<'T>
                                                 new TimespanData(timespanmilliseconds(x.Time,primo),x.D1)) listatagliata
  
         let listafunzione  = List.map ( fun x -> theoricfun (x:TimespanData).Time) listatimeshift
@@ -300,7 +267,7 @@ type Buffered1D (?item:List<TData1D>, ?soglia:float) =
     ///Fa la trasformata di fourier, usa come coefficiente radice n e per l'inversa è 1/(radice n )  
     ///</summary>
     member this.FFT() = 
-        let d1buff = Array.map(fun x -> ( new Numerics.Complex((x:TData1D).D1,0.0 ))) (this.GetArrayBuffer())
+        let d1buff = Array.map(fun x -> ( new Numerics.Complex((x:TData1D<'T>).D1,0.0 ))) (this.GetArrayBuffer())
         Transform.FourierForward(d1buff)
         d1buff 
         |> Array.map(fun x -> x.Real)
@@ -310,25 +277,26 @@ type Buffered1D (?item:List<TData1D>, ?soglia:float) =
     ///</summary>
     ///<param name="filter">il filtro, una funzione da complessi a unit </param>
     ///<return>nuovo Buffered1D con i valori filtrati</returns>
-    member this.FFFilter(filter:( Numerics.Complex -> unit) ):Buffered1D = 
-        let d1buff = Array.map (fun x -> ( new Numerics.Complex((x:TData1D).D1,0.0 ))) (this.GetArrayBuffer())
+    member this.FFFilter(filter:( Numerics.Complex -> unit) ):Buffered1D<'T> = 
+        let d1buff = Array.map (fun x -> ( new Numerics.Complex((x:TData1D<'T>).D1,0.0 ))) (this.GetArrayBuffer())
         Transform.FourierForward(d1buff)
         Array.iter(filter) d1buff
         Transform.FourierInverse(d1buff)
-        let valori = Array.map2(fun x y ->  { new TData1D with 
+        let valori = Array.map2(fun x y ->  { new TData1D<'T> with 
                                                     member this.D1 = (x:Numerics.Complex).Real
-                                                    member this.Time = (y:TData1D).Time
+                                                    member this.Time = (y:TData1D<'T>).Time
+                                                    member this.Info = (y:TData1D<'R>).Info
                                         })  d1buff  (this.GetArrayBuffer()) 
-        Buffered1D(new List<TData1D>(valori))
+        Buffered1D(new List<TData1D<'T>>(valori))
   
 
 
 
-type Buffered2D (?item:List<TData2D>, ?soglia:float) =
-    inherit BufferedData<TData2D>()
+type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
+    inherit BufferedData<TData2D<'T>>()
     
     let itemlist = match item with
-                            | None -> new List<TData2D>()
+                            | None -> new List<TData2D<'T>>()
                             | Some h -> h
 
     let threshold = match soglia with
@@ -344,11 +312,11 @@ type Buffered2D (?item:List<TData2D>, ?soglia:float) =
 
     member this.GetListBuffer() = Seq.toList(itemlist)
 
-    override this.AddItem(d:TData2D, filter:TData2D->bool) = 
+    override this.AddItem(d:TData2D<'T>, filter:TData2D<'T>->bool) = 
         if (filter d) then itemlist.Add(d)
 
 
-    override this.AddItem(d:TData2D) = 
+    override this.AddItem(d:TData2D<'T>) = 
         itemlist.Add (d)
 #if Reading
         //Evitare di fare il remove all inserendo eventi con orari arbitrari sarebbero cancellati
@@ -364,9 +332,9 @@ type Buffered2D (?item:List<TData2D>, ?soglia:float) =
     ///</summary>
     ///<param name="millisec"> la porzione di tempo da tenere a partire dall'istante attuale, in millisecondi </param>
     ///<returns>un nuovo oggetto Buffereed2D</returns>    
-    member this.cutBuffer(millisec:float):Buffered2D = 
+    member this.cutBuffer(millisec:float):Buffered2D<'T> = 
             let newlist = listcut(itemlist,millisec)
-            new Buffered2D(new List<TData2D> ( newlist))
+            new Buffered2D<'T>(new List<TData2D<'T>> ( newlist))
 
     ///<summary>
     ///Calcola la velocità istantanea degli ultimi eventi negli ultimi 100ms
@@ -429,53 +397,6 @@ type Buffered2D (?item:List<TData2D>, ?soglia:float) =
                     0.0 // TODO : Decidere cosa fare x quando non ho dettagli
 
 
-    // Sa di funzione inutile... un pò na cacata
-    ///<summary>
-    ///Da la direzione positiva o negativa se la lista di eventi a partire da un determinato timespan è consistente verso una direzione, 
-    ///altrimenti restituisce direzione casuale
-    ///</summary>
-    ///<param name="timespan">rappresenta la dimensione di tempo per cui controllare (millisecondi) </param>
-    ///<param name="tolleranza">tolleranza nelle possibilità di insuccesso, in caso di assenza non si prevede tolleranza</param>
-    ///<returns>la velocità istantanea oppure 0 se non ci sono 2 elementi necessari</returns>
-    member this.Direction ( timespan : float, ?tolleranza:float) = 
-            let last       = itemlist.Item(itemlist.Count - 1)
-            let newlist    = listcut (itemlist,timespan)
-            
-            let rightlist  = List.filter(fun x -> (x:TData2D).D1< last.D1 ) newlist
-            let leftlist   = List.filter(fun x -> (x:TData2D).D1> last.D1 ) newlist
-            let toplist    = List.filter(fun x -> (x:TData2D).D2< last.D2 ) newlist
-            let bottomlist = List.filter(fun x -> (x:TData2D).D2> last.D2 ) newlist
-     
-            let mutable toll = 1.0
-    
-            match tolleranza with 
-                | None -> toll<- 1.0
-                | Some s -> toll <- s
-
-            let minlength = toll * float newlist.Length 
-
-            if ( (float rightlist.Length) > minlength) then
-                
-                    if ((float toplist.Length) > minlength) 
-                        then Direction2D.TopRight
-                    elif ( (float bottomlist.Length) > minlength) 
-                        then Direction2D.BottomRight
-                    else 
-                        Direction2D.Right
-            elif ( (float leftlist.Length) > minlength) then
-                        
-                        if ( (float toplist.Length) > minlength) 
-                            then Direction2D.TopLeft
-                        elif (( float bottomlist.Length) > minlength) 
-                            then Direction2D.BottomLeft
-                        else Direction2D.Left
-            
-            elif ( (float toplist.Length) > minlength) then Direction2D.Top
-            elif ( (float bottomlist.Length) > minlength) then Direction2D.Bottom
-            else Direction2D.Casual            
-
-
-            
     ///<summary>
     ///Calcola la posizione media del punto dato un timespan e ritorna il valore
     ///</summary>
@@ -490,12 +411,12 @@ type Buffered2D (?item:List<TData2D>, ?soglia:float) =
                 else 
                     let D1 = (
                             lista
-                            |> List.map(fun x -> (x:TData2D).D1)
+                            |> List.map(fun x -> (x:TData2D<'T>).D1)
                             |> List.average
                             )
                     let D2 = (
                             lista
-                            |> List.map(fun x -> (x:TData2D).D2)
+                            |> List.map(fun x -> (x:TData2D<'T>).D2)
                             |> List.average
                             )
                     D1,D2
@@ -507,14 +428,18 @@ type Buffered2D (?item:List<TData2D>, ?soglia:float) =
     ///<param name="tolleranza">range di quanto può variare il valore dal punto centrale (in quantità assoluta)</param>
     ///<returns>vero o falso</returns>    
     member this.StationaryPosition(timespan : float, tolleranza:float) = 
-            let center = itemlist.Item(itemlist.Count-1)
-            let newlist = listcut(itemlist,timespan)
+            if itemlist.Count <2 
+                then 
+                    false
+                else
+                    let center = itemlist.Item(itemlist.Count-1)
+                    let newlist = listcut(itemlist,timespan)
 
-            let result = Seq.forall(fun x -> (StaticPoint((x:TData2D).D1,center.D1,tolleranza)  &&
-                                              StaticPoint((x:TData2D).D2,center.D2,tolleranza) 
-                                                    )) newlist
-            result
-
+                    let result = Seq.forall(fun x -> (StaticPoint((x:TData2D<'T>).D1,center.D1,tolleranza)  &&
+                                                      StaticPoint((x:TData2D<'T>).D2,center.D2,tolleranza))
+                                                      ) newlist
+                    result
+                
     ///<summary>
     /// fa il fitting alla retta, con la regressione lineare usando il metodo QR e restituisce 2 float
     /// L'equazione è Y = r1*X  + r0
@@ -522,10 +447,10 @@ type Buffered2D (?item:List<TData2D>, ?soglia:float) =
     ///<return>float[] della costante * float[] per il coefficiente della X</returns>
     member this.FittingToLine():float[]*float[] =
 
-            let ArrayX = Seq.toArray ( Seq.map(fun x -> (x:TData2D).D1) itemlist)
-            let ArrayY = Seq.toArray ( Seq.map(fun x -> (x:TData2D).D2) itemlist)
+            let ArrayX = Seq.toArray ( Seq.map(fun x -> (x:TData2D<'T>).D1) itemlist)
+            let ArrayY = Seq.toArray ( Seq.map(fun x -> (x:TData2D<'T>).D2) itemlist)
             let firsttime = itemlist.Item(0).Time
-            let arrayTime = Seq.toArray ( Seq.map(fun x -> timespanseconds((x:TData2D).Time , firsttime)) itemlist)
+            let arrayTime = Seq.toArray ( Seq.map(fun x -> timespanseconds((x:TData2D<'T>).Time , firsttime)) itemlist)
 
             let dim1x,dim2x  = linearRegression(ArrayX,arrayTime)    //  Y = dim2x * X + dim1x
             let dim1y,dim2y  = linearRegression(ArrayY,arrayTime)    //  Y = dim2x * X + dim1x
@@ -540,10 +465,10 @@ type Buffered2D (?item:List<TData2D>, ?soglia:float) =
     member this.FittingToLine(timespan:float):float[]*float[] =
 
             let listacorta = listcut (itemlist, timespan)
-            let ArrayX = Seq.toArray ( Seq.map(fun x -> (x:TData2D).D1) listacorta)
-            let ArrayY = Seq.toArray ( Seq.map(fun x -> (x:TData2D).D2) listacorta)
+            let ArrayX = Seq.toArray ( Seq.map(fun x -> (x:TData2D<'T>).D1) listacorta)
+            let ArrayY = Seq.toArray ( Seq.map(fun x -> (x:TData2D<'T>).D2) listacorta)
             let firsttime = listacorta.Item(0).Time
-            let arrayTime = Seq.toArray ( Seq.map(fun x -> timespanseconds((x:TData2D).Time , firsttime)) listacorta)
+            let arrayTime = Seq.toArray ( Seq.map(fun x -> timespanseconds((x:TData2D<'T>).Time , firsttime)) listacorta)
 
             let dim1x,dim2x  = linearRegression(ArrayX,arrayTime)    //  Y = dim2x * X + dim1x
             let dim1y,dim2y  = linearRegression(ArrayY,arrayTime)    //  Y = dim2x * X + dim1x
@@ -562,7 +487,7 @@ type Buffered2D (?item:List<TData2D>, ?soglia:float) =
         let vnoto,coeff = this.FittingToLine(timespan)
         let listacorta = listcut (itemlist,timespan)
         let firsttime = listacorta.Head.Time
-        let arrayTimed = List.map (fun x -> new TimespanData(timespanseconds((x:TData2D).Time , firsttime),(x:TData2D).D1,(x:TData2D).D2)) listacorta
+        let arrayTimed = List.map (fun x -> new TimespanData(timespanseconds((x:TData2D<'T>).Time , firsttime),(x:TData2D<'T>).D1,(x:TData2D<'T>).D2)) listacorta
  
         let result = 
             arrayTimed
@@ -577,15 +502,15 @@ type Buffered2D (?item:List<TData2D>, ?soglia:float) =
         
 
         let listacorta = listcut (itemlist, timespan)
-        let ArrayX = Seq.toArray ( Seq.map(fun x -> (x:TData2D).D1) listacorta)
-        let ArrayY = Seq.toArray ( Seq.map(fun x -> (x:TData2D).D2) listacorta)
+        let ArrayX = Seq.toArray ( Seq.map(fun x -> (x:TData2D<'T>).D1) listacorta)
+        let ArrayY = Seq.toArray ( Seq.map(fun x -> (x:TData2D<'T>).D2) listacorta)
         let firsttime = listacorta.Item(0).Time
-        let arrayTime = Seq.toArray ( Seq.map(fun x -> timespanseconds((x:TData2D).Time , firsttime)) listacorta)
+        let arrayTime = Seq.toArray ( Seq.map(fun x -> timespanseconds((x:TData2D<'T>).Time , firsttime)) listacorta)
 
         let vnoto,coeff  = linearRegression(ArrayY,ArrayX)    //  Y = dim2x * X + dim1x
 
         let firsttime = listacorta.Head.Time
-        let Listavalori = List.map (fun x -> new TimespanData(0.0,(x:TData2D).D1,(x:TData2D).D2)) listacorta
+        let Listavalori = List.map (fun x -> new TimespanData(0.0,(x:TData2D<'T>).D1,(x:TData2D<'T>).D2)) listacorta
  
         let result = 
             Listavalori
@@ -594,9 +519,9 @@ type Buffered2D (?item:List<TData2D>, ?soglia:float) =
 //        System.Console.WriteLine("Distanza eucidea totale = " + result.ToString() + " diviso le unità " + ( result /  float arrayTimed.Length ).ToString())
         Seq.forall(fun x -> ( x < tolleranza) )  result 
 
-    member this.Sample(funzione:(TData2D -> bool)) = 
-        let data  = new List<TData2D> ( Seq.filter(funzione) itemlist )
-        new Buffered2D(data ,threshold)
+    member this.Sample(funzione:(TData2D<'T> -> bool)) = 
+        let data  = new List<TData2D<'T>> ( Seq.filter(funzione) itemlist )
+        new Buffered2D<'T>(data ,threshold)
 
     
     ///<summary>
@@ -608,7 +533,7 @@ type Buffered2D (?item:List<TData2D>, ?soglia:float) =
  
         let listatagliata = listcut (itemlist,timespan)
         let primo = listatagliata.Head.Time
-        let listatimeshift = List.map (fun x -> let bb = x:TData2D
+        let listatimeshift = List.map (fun x -> let bb = x:TData2D<'T>
                                                 new TimespanData(timespanmilliseconds(x.Time,primo),x.D1,x.D2)) listatagliata
  
         let listafunzione  = List.map ( fun x -> theoricfun (x:TimespanData).Time) listatimeshift
@@ -621,8 +546,8 @@ type Buffered2D (?item:List<TData2D>, ?soglia:float) =
 
 
 
-type Buffered3D (?item:List<TData3D>, ?soglia:float) =
-    inherit BufferedData<TData3D>()
+type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
+    inherit BufferedData<TData3D<'T>>()
     
 
     let threshold = match soglia with
@@ -630,7 +555,7 @@ type Buffered3D (?item:List<TData3D>, ?soglia:float) =
                             | Some h -> h
 
     let itemlist = match item with
-                            | None -> new List<TData3D>()
+                            | None -> new List<TData3D<'T>>()
                             | Some h -> h
 
     member this.Count () = itemlist.Count    
@@ -641,10 +566,10 @@ type Buffered3D (?item:List<TData3D>, ?soglia:float) =
 
     member this.GetListBuffer() = Seq.toList(itemlist)
 
-    override this.AddItem(d:TData3D, filter:TData3D->bool) = 
+    override this.AddItem(d:TData3D<'T>, filter:TData3D<'T>->bool) = 
         if (filter d) then itemlist.Add(d)
 
-    override this.AddItem(d:TData3D) =
+    override this.AddItem(d:TData3D<'T>) =
             itemlist.Add  (d)
  #if Reading
             //Evitare di fare il remove all inserendo eventi con orari arbitrari sarebbero cancellati
@@ -658,9 +583,9 @@ type Buffered3D (?item:List<TData3D>, ?soglia:float) =
     ///</summary>
     ///<param name="millisec"> la porzione di tempo da tenere a partire dall'istante attuale, in millisecondi </param>
     ///<returns>un nuovo oggetto Buffereed2D</returns>    
-    member this.cutBuffer(millisec:float):Buffered3D = 
+    member this.cutBuffer(millisec:float):Buffered3D<'T> = 
             let newlist = listcut(itemlist,millisec)
-            new Buffered3D(new List<TData3D> ( newlist))
+            new Buffered3D<'T>(new List<TData3D<_>> ( newlist))
 
 
     ///<summary>
@@ -742,17 +667,17 @@ type Buffered3D (?item:List<TData3D>, ?soglia:float) =
                 else 
                     let D1 = (
                             lista
-                            |> List.map(fun x -> (x:TData3D).D1)
+                            |> List.map(fun x -> (x:TData3D<'T>).D1)
                             |> List.average
                             )
                     let D2 = (
                             lista
-                            |> List.map(fun x -> (x:TData3D).D2)
+                            |> List.map(fun x -> (x:TData3D<'T>).D2)
                             |> List.average
                             )
                     let D3 = (
                             lista
-                            |> List.map(fun x -> (x:TData3D).D3)
+                            |> List.map(fun x -> (x:TData3D<'T>).D3)
                             |> List.average
                             )
 
@@ -767,15 +692,19 @@ type Buffered3D (?item:List<TData3D>, ?soglia:float) =
     ///<param name="tolleranza">range di quanto può variare il valore dal punto centrale</param>
     ///<returns>vero o falso</returns>       
     member this.StationaryPosition(timespan : float, tolleranza:float) = 
-            let center = itemlist.Item(itemlist.Count-1)
-            let newlist = listcut(itemlist,timespan)
+            if itemlist.Count <2
+              then 
+                false
+              else
+                let center = itemlist.Item(itemlist.Count-1)
+                let newlist = listcut(itemlist,timespan)
 
-            let centeredlist = List.forall(fun x -> (StaticPoint((x:TData3D).D1,center.D1,tolleranza)  &&
-                                                     StaticPoint((x:TData3D).D2,center.D2,tolleranza)  &&
-                                                     StaticPoint((x:TData3D).D3,center.D3,tolleranza) 
-                                                    )) newlist
+                let centeredlist = List.forall(fun x -> (StaticPoint((x:TData3D<'T>).D1,center.D1,tolleranza)  &&
+                                                         StaticPoint((x:TData3D<'T>).D2,center.D2,tolleranza)  &&
+                                                         StaticPoint((x:TData3D<'T>).D3,center.D3,tolleranza) 
+                                                         )) newlist
 
-            centeredlist
+                centeredlist
 
     ///<summary>
     /// fa il fitting alla retta, con la regressione lineare usando il metodo QR e restituisce 2 float
@@ -784,12 +713,12 @@ type Buffered3D (?item:List<TData3D>, ?soglia:float) =
     ///<return>float[] della costante * float[] per il coefficiente della X</returns>
     member this.FittingToLine():float[]*float[] =
 
-            let ArrayX = Seq.toArray ( Seq.map(fun x -> (x:TData3D).D1) itemlist)
-            let ArrayY = Seq.toArray ( Seq.map(fun x -> (x:TData3D).D2) itemlist)
-            let ArrayZ = Seq.toArray ( Seq.map(fun x -> (x:TData3D).D3) itemlist)
+            let ArrayX = Seq.toArray ( Seq.map(fun x -> (x:TData3D<'T>).D1) itemlist)
+            let ArrayY = Seq.toArray ( Seq.map(fun x -> (x:TData3D<'T>).D2) itemlist)
+            let ArrayZ = Seq.toArray ( Seq.map(fun x -> (x:TData3D<'T>).D3) itemlist)
 
             let firsttime = itemlist.Item(0).Time
-            let arrayTime = Seq.toArray ( Seq.map(fun x -> timespanseconds((x:TData3D).Time , firsttime)) itemlist)
+            let arrayTime = Seq.toArray ( Seq.map(fun x -> timespanseconds((x:TData3D<'T>).Time , firsttime)) itemlist)
 
             let dim1x,dim2x  = linearRegression(ArrayX,arrayTime)    //  Y = dim2x * X + dim1x
             let dim1y,dim2y  = linearRegression(ArrayY,arrayTime)    //  Y = dim2x * X + dim1x
@@ -807,12 +736,12 @@ type Buffered3D (?item:List<TData3D>, ?soglia:float) =
     member this.FittingToLine(timespan:float):float[]*float[] =
 
             let listacorta = listcut (itemlist, timespan)
-            let ArrayX = Seq.toArray ( Seq.map(fun x -> (x:TData3D).D1) listacorta)
-            let ArrayY = Seq.toArray ( Seq.map(fun x -> (x:TData3D).D2) listacorta)
-            let ArrayZ = Seq.toArray ( Seq.map(fun x -> (x:TData3D).D3) listacorta)
+            let ArrayX = Seq.toArray ( Seq.map(fun x -> (x:TData3D<'T>).D1) listacorta)
+            let ArrayY = Seq.toArray ( Seq.map(fun x -> (x:TData3D<'T>).D2) listacorta)
+            let ArrayZ = Seq.toArray ( Seq.map(fun x -> (x:TData3D<'T>).D3) listacorta)
 
             let firsttime = listacorta.Item(0).Time
-            let arrayTime = Seq.toArray ( Seq.map(fun x -> timespanseconds((x:TData3D).Time , firsttime)) listacorta)
+            let arrayTime = Seq.toArray ( Seq.map(fun x -> timespanseconds((x:TData3D<'T>).Time , firsttime)) listacorta)
 
             let dim1x,dim2x  = linearRegression(ArrayX,arrayTime)    //  Y = dim2x * X + dim1x
             let dim1y,dim2y  = linearRegression(ArrayY,arrayTime)    //  Y = dim2x * X + dim1x
@@ -833,7 +762,7 @@ type Buffered3D (?item:List<TData3D>, ?soglia:float) =
         let vnoto,coeff = this.FittingToLine(timespan)
         let listacorta = listcut (itemlist,timespan)
         let firsttime = listacorta.Head.Time
-        let arrayTimed = List.map (fun x -> new TimespanData(timespanseconds((x:TData3D).Time , firsttime),(x:TData3D).D1,(x:TData3D).D2,(x:TData3D).D3)) listacorta
+        let arrayTimed = List.map (fun x -> new TimespanData(timespanseconds((x:TData3D<'T>).Time , firsttime),(x:TData3D<'T>).D1,(x:TData3D<'T>).D2,(x:TData3D<'T>).D3)) listacorta
  
         let result = 
             arrayTimed
@@ -844,9 +773,9 @@ type Buffered3D (?item:List<TData3D>, ?soglia:float) =
                                                         then true
                                                         else false 
 
-    member this.Sample(funzione:(TData3D -> bool)) = 
-        let data  = new List<TData3D> ( Seq.filter(funzione) itemlist )
-        new Buffered3D(data ,threshold)
+    member this.Sample(funzione:(TData3D<'T> -> bool)) = 
+        let data  = new List<TData3D<'T>> ( Seq.filter(funzione) itemlist )
+        new Buffered3D<'T>(data ,threshold)
 
 
 
@@ -859,7 +788,7 @@ type Buffered3D (?item:List<TData3D>, ?soglia:float) =
  
         let listatagliata = listcut (itemlist,timespan)
         let primo = listatagliata.Head.Time
-        let listatimeshift = List.map (fun x -> let bb = x:TData3D
+        let listatimeshift = List.map (fun x -> let bb = x:TData3D<'T>
                                                 new TimespanData(timespanmilliseconds(x.Time,primo),x.D1,x.D2,x.D3)) listatagliata
  
         let listafunzione  = List.map ( fun x -> theoricfun (x:TimespanData).Time) listatimeshift

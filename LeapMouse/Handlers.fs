@@ -9,9 +9,8 @@ open GestIT.Leap
 
 type Delegate = delegate of unit -> unit
 
-
 let standingTL_h (app:TrayApplication) (contr:LMController) (sender:_, f:LeapFeatureTypes, e:System.EventArgs) =  
-       let ee = e:?>Buffered2D 
+       let ee = e:?>Buffered2D<FingerInfo> 
        let element = ee.GetListBuffer().[( ee.GetListBuffer().Length - 1 )]
 
        ee.Clear()
@@ -22,7 +21,7 @@ let standingTL_h (app:TrayApplication) (contr:LMController) (sender:_, f:LeapFea
        System.Console.WriteLine("angolotopleft")
 
 let standingLR_h (app:TrayApplication) (contr:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) =
-       let ee = e:?>Buffered2D        
+       let ee = e:?>Buffered2D<FingerInfo>     
        let element = ee.GetListBuffer().[( ee.GetListBuffer().Length - 1 )]
 
        ee.Clear()
@@ -37,13 +36,18 @@ let ditoapparso_h (app:TrayApplication) (sender:_,f:LeapFeatureTypes,e:System.Ev
        |>ignore
        System.Console.WriteLine("dito trovato")
 
+let nomod_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
+       controller.Modify(false)
+       System.Console.WriteLine("stop modifiche per calibrazione")
+
 let setcalibratingfinger_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
        let ee = e:?> LeapSensorEventArgs
        controller.SetCalibratingFinger(ee.ActivityFingers.Head.Id)
 
 
 let moving_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
-       let ee = (e:?> Buffered2D).GetListBuffer()
+
+       let ee = (e:?> Buffered2D<FingerInfo>).GetListBuffer()
 
        if (ee.Length >1) then
            let element = ee.[( ee.Length - 1 )]

@@ -44,7 +44,7 @@ type TEvent<'X,'V> (triggerfun : 'V -> bool, ?active: bool, ?name:string)=
 ///'W il tipo di Tdata che contiene il dato da controllare con i predicati 
 ///</summary>
 ///<param name="data">l'oggetto buffer su cui controllare gli eventi</param>
-type EventBuffer<'T,'W> when 'T :> BufferedData<'W> and 'W :> Data (data:'T)  =
+type EventBuffer<'T,'W,'U> when 'T :> BufferedData<'W> and 'W :> Data<'U> (data:'T)  =
 
     let eventlist = new List<TEvent<_,_>>()
     

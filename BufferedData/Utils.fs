@@ -17,7 +17,7 @@ open MathNet.Numerics.IntegralTransforms.Algorithms
 /// <param name="lista">La lista di TData</param>
 /// <param name="timespan">Il timespan, unità espressa in millisecondi e positiva  </param>
 /// <returns>La lista tagliata</returns>
-let listcut (lista : List<'U> when 'U :> TData, timespan : float) =
+let listcut (lista : List<'U> when 'U :> TData<'T>, timespan : float) =
         if Seq.length lista >0
            then
            let lastitem = (lista.Item(Seq.length lista-1)).Time

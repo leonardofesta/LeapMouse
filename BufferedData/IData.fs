@@ -1,18 +1,19 @@
 ﻿module BufferData.IData
 
 
-type Data =
+type Data<'T> =
     interface
+        abstract member Info : 'T
     end
 
-type Accumulator<'U> when 'U :> Data = 
+type Accumulator<'U,'T> when 'U :> Data<'T> = 
 
     abstract member AddItem :   'U -> unit
 
     abstract member Restart :   unit -> unit
 
 //capire se vale la pena avere questa interfaccia
-type NumericData<'U> when 'U :> Data = 
+type NumericData<'U,'T> when 'U :> Data<'T> = 
 
     abstract member Sum         :   'U
                 with get
@@ -24,21 +25,21 @@ type NumericData<'U> when 'U :> Data =
                 with get
 
 
-type Data1D = 
-    inherit Data
+type Data1D<'T> = 
+    inherit Data<'T>
     abstract member D1 : float
                 with get 
 
 
-type Data2D = 
-    inherit Data
+type Data2D<'T> = 
+    inherit Data<'T>
     abstract member D1 : float
                 with get 
     abstract member D2 : float
                 with get 
     
-type Data3D =
-    inherit Data
+type Data3D<'T> =
+    inherit Data<'T>
     abstract member D1 : float
                 with get 
     abstract member D2 : float       
@@ -48,25 +49,25 @@ type Data3D =
 
                 
 
-type TData = 
-    inherit Data
+type TData<'T> = 
+    inherit Data<'T>
     abstract member Time : System.DateTime
                 with get
 
-type TData1D =
-    inherit TData
+type TData1D<'T> =
+    inherit TData<'T>
     abstract member D1 : float
                 with get 
 
-type TData2D =
-    inherit TData
+type TData2D<'T> =
+    inherit TData<'T>
     abstract member D1 : float
                 with get 
     abstract member D2 : float       
                 with get
 
-type TData3D =
-    inherit TData
+type TData3D<'T> =
+    inherit TData<'T>
     abstract member D1 : float
                 with get 
     abstract member D2 : float       

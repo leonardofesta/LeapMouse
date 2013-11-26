@@ -12,14 +12,14 @@ let eventbuilder( app:_,cont:LMController) =
     let fermo     = new GroundTerm<_,_>(LeapFeatureTypes.Stabile)
     let fermo2    = new GroundTerm<_,_>(LeapFeatureTypes.Stabile2)
     let moving    = new GroundTerm<_,_>(LeapFeatureTypes.Moving)
+    let stopmodify = new GroundTerm<_,_>(LeapFeatureTypes.Calibrato)
 //    let start = new GroundTerm<_,_>(LeapFeatureTypes.NewHand)
 
-    let events = ((nuovodito |-> ditoapparso_h app) |>> (fermo |-> standingTL_h app cont ) |>> (fermo2 |-> standingLR_h app cont ) |>> !*(moving |-> moving_h app cont))
+    let events = ((nuovodito |-> ditoapparso_h app) |>> (fermo |-> standingTL_h app cont ) |>> (fermo2 |-> standingLR_h app cont ) |>> (stopmodify |-> nomod_h app cont) |>> !*(moving |-> moving_h app cont))
 //    let calibrazione = (fermo2 |-> standingTL_h app cont) |>> (fermo |-> standingLR_h app cont)
 //    let events = (nuovodito |-> ditoapparso_h app)
 
 //    nuovodito |-> ditoapparso_h app
-
 
     events
 
