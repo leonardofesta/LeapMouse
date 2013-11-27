@@ -53,6 +53,7 @@
     <None Include="App.config" />
     <Compile Include="Data.fs" />
     <Compile Include="FrameApplication.fs" />
+    <Compile Include="MouseInteroperator.fs" />
     <Compile Include="Controller.fs" />
     <Compile Include="Handlers.fs" />
     <Compile Include="Automa.fs" />

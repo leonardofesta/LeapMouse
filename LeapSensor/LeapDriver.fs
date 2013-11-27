@@ -12,6 +12,9 @@ type LeapActivity =
 | NewTool of int list
 | ActiveTool of int list
 | InactiveTool of int list
+| NewGesture of int list
+| ActiveGesture of int list
+| InactiveGesture of int list
 
 type LeapSensorEventArgs(f:Frame, ?activity) =
   inherit System.EventArgs()
@@ -37,6 +40,13 @@ type LeapSensorEventArgs(f:Frame, ?activity) =
       | Some(NewTool l) | Some(ActiveTool l)-> f.Tools |> Seq.filter (fun h -> l |> List.exists(fun el -> h.Id = el)) |> Seq.toList
       | _ -> []
 
+  member this.ActivityGestures
+    with get() =
+      match activity with
+      | Some(NewGesture l) | Some(ActiveGesture l)-> f.Gestures() |> Seq.filter (fun h -> l |> List.exists(fun el -> h.Id = el)) |> Seq.toList
+      | _ -> []
+
+
 type LeapSensor() =
   inherit Listener()
 
@@ -60,6 +70,13 @@ type LeapSensor() =
   let activeToolEvt = new Event<LeapSensorEventArgs>()
   let inactiveToolEvt = new Event<LeapSensorEventArgs>()
   
+  let mutable activeGestures : int Set = Set.empty
+  let newGestureEvt = new Event<LeapSensorEventArgs>()
+  let activeGestureEvt = new Event<LeapSensorEventArgs>()
+  let inactiveGestureEvt = new Event<LeapSensorEventArgs>()
+
+
+
   member this.Controller = controller
 
   member this.Connect    () = controller.AddListener(this)
@@ -79,6 +96,11 @@ type LeapSensor() =
   member this.InactiveHand = inactiveHandEvt.Publish
   member this.InactiveFinger = inactiveFingerEvt.Publish
   member this.InactiveTool = inactiveToolEvt.Publish
+
+  member this.NewGesture = newGestureEvt.Publish
+  member this.ActiveGesture = activeGestureEvt.Publish
+  member this.InactiveGesture = inactiveGestureEvt.Publish
+
 
   override this.Dispose () =
     this.Disconnect() |> ignore
@@ -122,6 +144,18 @@ type LeapSensor() =
       if not dt.IsEmpty then inactiveToolEvt.Trigger(new LeapSensorEventArgs(frame, InactiveTool (dt |> Set.toList)))
       activeTools <- ts
 
+    let processGestures () =
+      let ts = frame.Gestures() |> Seq.map (fun h -> h.Id) |> Set.ofSeq
+      let nt = ts - activeGestures
+      let at = ts |> Set.intersect activeGestures
+      let dt = activeGestures - ts
+      if not nt.IsEmpty then newGestureEvt.Trigger(new LeapSensorEventArgs(frame, NewGesture (nt |> Set.toList)))
+      if not at.IsEmpty then activeGestureEvt.Trigger(new LeapSensorEventArgs(frame, ActiveGesture (at |> Set.toList)))
+      if not dt.IsEmpty then inactiveGestureEvt.Trigger(new LeapSensorEventArgs(frame, InactiveGesture (dt |> Set.toList)))
+      activeGestures <- ts
+
+
     processHands()
     processFingers()
     processTools()
+    processGestures()

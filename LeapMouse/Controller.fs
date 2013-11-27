@@ -3,9 +3,13 @@
 open LeapMouse.FrameApplication
 open System.Windows.Forms
 open System
+open LeapMouse.MouseInteroperator
+
 
 type Delegate = delegate of unit -> unit
 
+
+extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
 type LMController(app:TrayApplication) = 
     let mutable fingerid = -1
     let mutable left   = -300.0
@@ -16,6 +20,10 @@ type LMController(app:TrayApplication) =
     let mutable LeapW  = 600.0
     let mutable modifyTL = true
     let mutable modifyBR = true
+
+    let mutable mouseposX = 0L
+    let mutable mouseposY = 0L
+
 
     let desktopH = System.Windows.Forms.SystemInformation.VirtualScreen.Height
     let desktopW = System.Windows.Forms.SystemInformation.VirtualScreen.Width
@@ -54,10 +62,21 @@ type LMController(app:TrayApplication) =
         let propY = (top - leapY)/LeapH
         let fmouseX = float desktopW * propX
         let fmouseY = float desktopH * propY
+        mouseposX <- int64 fmouseX
+        mouseposY <- int64 fmouseY 
         (int fmouseX),(int fmouseY)
 
     member this.SetCalibratingFinger(id:int) = 
-        if not(fingerid = -1 ) then fingerid <- id
+        if (fingerid = -1 ) then fingerid <- id
+        System.Console.WriteLine("dito settato a " + fingerid.ToString())
 
     member this.ClearCalibratingFinger() =
         fingerid <- -1
+
+    member this.AlreadyCalibrating() =
+        if (fingerid = -1) then false
+                           else true
+
+    member this.LeftClickmouse() = 
+        System.Console.WriteLine("mouse clickato")
+        MouseInteroperator.MouseLeftClick(mouseposX,mouseposY)

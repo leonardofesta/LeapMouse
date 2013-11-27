@@ -47,3 +47,4 @@ open BufferData.IData
                 | CalibrationFinger = 4
                 | Stabile2 = 5
                 | Calibrato = 6
+                | LClick = 7

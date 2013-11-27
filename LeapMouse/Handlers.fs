@@ -31,7 +31,7 @@ let standingLR_h (app:TrayApplication) (contr:LMController) (sender:_,f:LeapFeat
        |>ignore
        System.Console.WriteLine("angolobottomright")
 
-let ditoapparso_h (app:TrayApplication) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
+let ditoapparso_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
        app.Invoke(new Delegate(fun () -> app.PopText("dito trovato")))
        |>ignore
        System.Console.WriteLine("dito trovato")
@@ -43,6 +43,10 @@ let nomod_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeat
 let setcalibratingfinger_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
        let ee = e:?> LeapSensorEventArgs
        controller.SetCalibratingFinger(ee.ActivityFingers.Head.Id)
+       System.Console.WriteLine("stiamo settando il dito")
+       app.Invoke(new Delegate(fun () -> app.PopText("dito trovato")))
+       |>ignore
+       System.Console.WriteLine("dito trovato")
 
 
 let moving_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
@@ -56,3 +60,7 @@ let moving_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFea
            |>ignore
 
        System.Console.WriteLine("mouse mosso")
+
+let leftclick_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
+        System.Console.WriteLine("Leftclickhandler")
+        controller.LeftClickmouse()

@@ -10,17 +10,6 @@ open MathNet.Numerics.Distributions
 open MathNet.Numerics.IntegralTransforms
 open MathNet.Numerics.IntegralTransforms.Algorithms
 
-type Direction2D = 
-        |   Casual = 0
-        |   Top = 1
-        |   TopRight = 2 
-        |   Right = 3
-        |   BottomRight  = 4 
-        |   Bottom = 5
-        |   BottomLeft = 6
-        |   Left = 7
-        |   TopLeft = 8
-
 type TimespanData(timespan:float,x:float,?y:float,?z:float) = 
 
            member this.D1:float = x
@@ -74,12 +63,31 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
     ///</summary>
     ///<param name="millisec"> la porzione di tempo da tenere a partire dall'istante attuale, in millisecondi </param>
     ///<returns>un oggetto Buffereed1D</returns>    
-    member this.cutBuffer(millisec:float):Buffered1D<'U> = 
+    member this.cutBuffer(millisec:float):Buffered1D<'T> = 
             let newlist = listcut(itemlist,millisec)
             new Buffered1D<'T>(new List<TData1D<'T>> ( newlist))
 
+    ///<summary>
+    ///Calcola la lunghezza del periodo reale di tempo campionato dal buffer 
+    ///dal primo evento disponibile all'ultimo rispetto il tempo attuale
+    ///</summary>
+    ///<returns>un oggetto float rappresentante i millisecondi </returns>    
+    member this.PeriodLength():float =
+            if (itemlist.Count < 1) 
+                then 
+                    0.0
+                else  
+                    let primo = itemlist.[0]
+                    (System.DateTime.Now.Subtract (primo.Time)).TotalMilliseconds
 
-
+    ///<summary>
+    ///Calcola se la cardinalità dei dati nel buffer è maggiore/uguale di una certa soglia
+    ///</summary>
+    ///<param name="n">intero che rappresenta la soglia della cardinalità da controlalre</param>
+    ///<returns>True se il numero di item nel buffer è almeno n, False altrimenti</returns>   
+    member this.Cardinality(n:int):Boolean = 
+             n>=itemlist.Count
+    
     ///<summary>
     ///Calcola la distanza totale percorsa percorsa dato un intervallo di tempo, in millisecondi
     ///</summary>
@@ -285,7 +293,7 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
         let valori = Array.map2(fun x y ->  { new TData1D<'T> with 
                                                     member this.D1 = (x:Numerics.Complex).Real
                                                     member this.Time = (y:TData1D<'T>).Time
-                                                    member this.Info = (y:TData1D<'R>).Info
+                                                    member this.Info = (y:TData1D<'T>).Info
                                         })  d1buff  (this.GetArrayBuffer()) 
         Buffered1D(new List<TData1D<'T>>(valori))
   
@@ -325,6 +333,28 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
         |>ignore
 
 #endif
+
+    ///<summary>
+    ///Calcola la lunghezza del periodo reale di tempo campionato dal buffer 
+    ///dal primo evento disponibile all'ultimo rispetto il tempo attuale
+    ///</summary>
+    ///<returns>un oggetto float rappresentante i millisecondi </returns>    
+    member this.PeriodLength():float =
+            if (itemlist.Count < 1) 
+                then 
+                    0.0
+                else  
+                    let primo = itemlist.[0]
+                    (System.DateTime.Now.Subtract (primo.Time)).TotalMilliseconds
+
+    ///<summary>
+    ///Calcola se la cardinalità dei dati nel buffer è maggiore/uguale di una certa soglia
+    ///</summary>
+    ///<param name="n">intero che rappresenta la soglia della cardinalità da controlalre</param>
+    ///<returns>True se il numero di item nel buffer è almeno n, False altrimenti</returns>   
+    member this.Cardinality(n:int):Boolean = 
+             n>=itemlist.Count
+    
 
 
     ///<summary>
@@ -577,6 +607,31 @@ type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
             itemlist.RemoveAll(fun x -> (x.Time < System.DateTime.Now.AddMilliseconds(-1.0*threshold)))
             |>ignore
 #endif
+
+
+
+    ///<summary>
+    ///Calcola la lunghezza del periodo reale di tempo campionato dal buffer 
+    ///dal primo evento disponibile all'ultimo rispetto il tempo attuale
+    ///</summary>
+    ///<returns>un oggetto float rappresentante i millisecondi </returns>    
+    member this.PeriodLength():float =
+            if (itemlist.Count < 1) 
+                then 
+                    0.0
+                else  
+                    let primo = itemlist.[0]
+                    (System.DateTime.Now.Subtract (primo.Time)).TotalMilliseconds
+
+
+    ///<summary>
+    ///Calcola se la cardinalità dei dati nel buffer è maggiore/uguale di una certa soglia
+    ///</summary>
+    ///<param name="n">intero che rappresenta la soglia della cardinalità da controlalre</param>
+    ///<returns>True se il numero di item nel buffer è almeno n, False altrimenti</returns>   
+    member this.Cardinality(n:int):Boolean = 
+             n>=itemlist.Count
+    
 
     ///<summary>
     ///Restituisce un nuovo oggetto con il buffer tagliato a tot millisecondi
