@@ -22,9 +22,13 @@ let main argv =
     let sensor = new FusionSensor<LeapFeatureTypes,System.EventArgs>()
     let app = new TrayApplication()
     let controller = new LMController(app)
-   // let calibrazione = calibrazionebuilder(app,controller)
+    // let calibrazione = calibrazionebuilder(app,controller)
     let eventi = eventbuilder(app,controller)
     let leap = new LeapSensor()
+    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPESCREENTAP)
+    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPECIRCLE)
+    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPESWIPE)
+    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPEKEYTAP)
     leap.Controller.SetPolicyFlags(Leap.Controller.PolicyFlag.POLICYBACKGROUNDFRAMES)
 
     let buff = new Buffered2D<_>()
@@ -34,6 +38,8 @@ let main argv =
                                                              if (List.length fingerlist = 1) then
                                                                                                  let a = new Td2d(float fingerlist.Head.StabilizedTipPosition.x, float fingerlist.Head.StabilizedTipPosition.y, new FingerInfo(fingerlist.Head.Id))
                                                                                                  evbuffer.AddItem(a)
+
+
 
     let StationaryEvent  = new TEvent<_,_> (stationary (4000.0,40.0),true,"DitoStazionario")
     let StationaryEvent2 = new TEvent<_,_> (stationary (3000.0,40.0),true,"DitoStazionario2")
@@ -52,7 +58,7 @@ let main argv =
     sensor.Listen(LeapFeatureTypes.NewFinger, leap.NewFinger |> Event.map(fun x->x :> System.EventArgs))
     sensor.Listen(LeapFeatureTypes.Moving, MovingEvent.Publish |> Event.map(fun x->x :> System.EventArgs)) 
     sensor.Listen(LeapFeatureTypes.Calibrato, StopModifica.Publish |> Event.map ( fun x -> x :> System.EventArgs))
-    sensor.Listen(LeapFeatureTypes.LClick, leap.NewGesture |> Event.map (fun x-> x :> System.EventArgs))
+    sensor.Listen(LeapFeatureTypes.LClick, leap.NewScreenTapGesture |> Event.map (fun x-> x :> System.EventArgs))
     
 
     leap.Connect() |> ignore

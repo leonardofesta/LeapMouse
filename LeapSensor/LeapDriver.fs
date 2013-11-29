@@ -15,6 +15,19 @@ type LeapActivity =
 | NewGesture of int list
 | ActiveGesture of int list
 | InactiveGesture of int list
+| NewScreenTapGesture of int list
+| ActiveScreenTapGesture of int list
+| InactiveScreenTapGesture of int list
+| NewKeyTapGesture of int list
+| ActiveKeyTapGesture of int list
+| InactiveKeyTapGesture of int list
+| NewCircleGesture of int list
+| ActiveCircleGesture of int list
+| InactiveCircleGesture of int list
+| NewSwipeGesture of int list
+| ActiveSwipeGesture of int list
+| InactiveSwipeGesture of int list
+
 
 type LeapSensorEventArgs(f:Frame, ?activity) =
   inherit System.EventArgs()
@@ -46,6 +59,30 @@ type LeapSensorEventArgs(f:Frame, ?activity) =
       | Some(NewGesture l) | Some(ActiveGesture l)-> f.Gestures() |> Seq.filter (fun h -> l |> List.exists(fun el -> h.Id = el)) |> Seq.toList
       | _ -> []
 
+  member this.ScreenTapGestures
+    with get() =
+      match activity with
+      | Some(NewScreenTapGesture l) | Some(ActiveScreenTapGesture l)-> f.Gestures() |> Seq.filter(fun g -> g.Type=Leap.Gesture.GestureType.TYPESCREENTAP)  |> Seq.filter (fun h -> l |> List.exists(fun el -> h.Id = el)) |> Seq.toList
+      | _ -> []
+
+  member this.KeyTapGestures
+    with get() =
+      match activity with
+      | Some(NewKeyTapGesture l) | Some(ActiveKeyTapGesture l)-> f.Gestures() |> Seq.filter(fun g -> g.Type=Leap.Gesture.GestureType.TYPEKEYTAP)  |> Seq.filter (fun h -> l |> List.exists(fun el -> h.Id = el)) |> Seq.toList
+      | _ -> []
+  
+  member this.CircleGestures
+    with get() =
+      match activity with
+      | Some(NewCircleGesture l) | Some(ActiveCircleGesture l)-> f.Gestures() |> Seq.filter(fun g -> g.Type=Leap.Gesture.GestureType.TYPECIRCLE)  |> Seq.filter (fun h -> l |> List.exists(fun el -> h.Id = el)) |> Seq.toList
+      | _ -> []
+
+  member this.SwipeGestures
+    with get() =
+      match activity with
+      | Some(NewSwipeGesture l) | Some(ActiveSwipeGesture l)-> f.Gestures() |> Seq.filter(fun g -> g.Type=Leap.Gesture.GestureType.TYPESWIPE)  |> Seq.filter (fun h -> l |> List.exists(fun el -> h.Id = el)) |> Seq.toList
+      | _ -> []
+
 
 type LeapSensor() =
   inherit Listener()
@@ -75,6 +112,26 @@ type LeapSensor() =
   let activeGestureEvt = new Event<LeapSensorEventArgs>()
   let inactiveGestureEvt = new Event<LeapSensorEventArgs>()
 
+  let mutable activeScreenTapGestures : int Set = Set.empty
+  let newScreenTapGestureEvt = new Event<LeapSensorEventArgs>()
+  let activeScreenTapGestureEvt = new Event<LeapSensorEventArgs>()
+  let inactiveScreenTapGestureEvt = new Event<LeapSensorEventArgs>()
+
+  let mutable activeKeyTapGestures : int Set = Set.empty
+  let newKeyTapGestureEvt = new Event<LeapSensorEventArgs>()
+  let activeKeyTapGestureEvt = new Event<LeapSensorEventArgs>()
+  let inactiveKeyTapGestureEvt = new Event<LeapSensorEventArgs>()
+
+  let mutable activeCircleGestures : int Set = Set.empty
+  let newCircleGestureEvt = new Event<LeapSensorEventArgs>()
+  let activeCircleGestureEvt = new Event<LeapSensorEventArgs>()
+  let inactiveCircleGestureEvt = new Event<LeapSensorEventArgs>()
+
+  let mutable activeSwipeGestures : int Set = Set.empty
+  let newSwipeGestureEvt = new Event<LeapSensorEventArgs>()
+  let activeSwipeGestureEvt = new Event<LeapSensorEventArgs>()
+  let inactiveSwipeGestureEvt = new Event<LeapSensorEventArgs>()
+
 
 
   member this.Controller = controller
@@ -100,6 +157,22 @@ type LeapSensor() =
   member this.NewGesture = newGestureEvt.Publish
   member this.ActiveGesture = activeGestureEvt.Publish
   member this.InactiveGesture = inactiveGestureEvt.Publish
+
+  member this.NewScreenTapGesture = newScreenTapGestureEvt.Publish
+  member this.ActiveScreenTapGesture = activeScreenTapGestureEvt.Publish
+  member this.InactiveScreenTapGesture = inactiveScreenTapGestureEvt.Publish
+
+  member this.NewKeyTapGesture = newKeyTapGestureEvt.Publish
+  member this.ActivewKeyTapGesture = activeKeyTapGestureEvt.Publish
+  member this.InactivewKeyTapGesture = inactiveKeyTapGestureEvt.Publish
+
+  member this.NewCircleGesture = newCircleGestureEvt.Publish
+  member this.ActiveCircleGesture = activeCircleGestureEvt.Publish
+  member this.InactiveCircleGesture = inactiveCircleGestureEvt.Publish
+
+  member this.NewSwipeGesture = newSwipeGestureEvt.Publish
+  member this.ActiveSwipeGesture = activeSwipeGestureEvt.Publish
+  member this.InactiveSwipeGesture = inactiveSwipeGestureEvt.Publish
 
 
   override this.Dispose () =
@@ -154,8 +227,53 @@ type LeapSensor() =
       if not dt.IsEmpty then inactiveGestureEvt.Trigger(new LeapSensorEventArgs(frame, InactiveGesture (dt |> Set.toList)))
       activeGestures <- ts
 
+    let processScreenTaps () =
+      let ts = frame.Gestures() |> Seq.filter(fun f -> f.Type=Gesture.GestureType.TYPESCREENTAP) |> Seq.map (fun h -> h.Id) |> Set.ofSeq
+      let nt = ts - activeScreenTapGestures
+      let at = ts |> Set.intersect activeScreenTapGestures
+      let dt = activeScreenTapGestures - ts
+      if not nt.IsEmpty then newScreenTapGestureEvt.Trigger(new LeapSensorEventArgs(frame, NewScreenTapGesture (nt |> Set.toList)))
+      if not at.IsEmpty then activeScreenTapGestureEvt.Trigger(new LeapSensorEventArgs(frame, ActiveScreenTapGesture (at |> Set.toList)))
+      if not dt.IsEmpty then inactiveScreenTapGestureEvt.Trigger(new LeapSensorEventArgs(frame, InactiveScreenTapGesture (dt |> Set.toList)))
+      activeScreenTapGestures <- ts
+
+    let processKeyTaps () =
+      let ts = frame.Gestures() |> Seq.filter(fun f -> f.Type=Gesture.GestureType.TYPEKEYTAP) |> Seq.map (fun h -> h.Id) |> Set.ofSeq
+      let nt = ts - activeKeyTapGestures
+      let at = ts |> Set.intersect activeKeyTapGestures
+      let dt = activeKeyTapGestures - ts
+      if not nt.IsEmpty then newKeyTapGestureEvt.Trigger(new LeapSensorEventArgs(frame, NewKeyTapGesture (nt |> Set.toList)))
+      if not at.IsEmpty then activeKeyTapGestureEvt.Trigger(new LeapSensorEventArgs(frame, ActiveKeyTapGesture (at |> Set.toList)))
+      if not dt.IsEmpty then inactiveKeyTapGestureEvt.Trigger(new LeapSensorEventArgs(frame, InactiveKeyTapGesture (dt |> Set.toList)))
+      activeKeyTapGestures <- ts
+
+    let processCircle () =
+      let ts = frame.Gestures() |> Seq.filter(fun f -> f.Type=Gesture.GestureType.TYPECIRCLE) |> Seq.map (fun h -> h.Id) |> Set.ofSeq
+      let nt = ts - activeCircleGestures
+      let at = ts |> Set.intersect activeCircleGestures
+      let dt = activeCircleGestures - ts
+      if not nt.IsEmpty then newCircleGestureEvt.Trigger(new LeapSensorEventArgs(frame, NewCircleGesture (nt |> Set.toList)))
+      if not at.IsEmpty then activeCircleGestureEvt.Trigger(new LeapSensorEventArgs(frame, ActiveCircleGesture (at |> Set.toList)))
+      if not dt.IsEmpty then inactiveCircleGestureEvt.Trigger(new LeapSensorEventArgs(frame, InactiveCircleGesture (dt |> Set.toList)))
+      activeCircleGestures <- ts
+
+    let processSwipe () =
+      let ts = frame.Gestures() |> Seq.filter(fun f -> f.Type=Gesture.GestureType.TYPESWIPE) |> Seq.map (fun h -> h.Id) |> Set.ofSeq
+      let nt = ts - activeSwipeGestures
+      let at = ts |> Set.intersect activeSwipeGestures
+      let dt = activeSwipeGestures - ts
+      if not nt.IsEmpty then newSwipeGestureEvt.Trigger(new LeapSensorEventArgs(frame, NewSwipeGesture (nt |> Set.toList)))
+      if not at.IsEmpty then activeSwipeGestureEvt.Trigger(new LeapSensorEventArgs(frame, ActiveSwipeGesture (at |> Set.toList)))
+      if not dt.IsEmpty then inactiveSwipeGestureEvt.Trigger(new LeapSensorEventArgs(frame, InactiveSwipeGesture (dt |> Set.toList)))
+      activeSwipeGestures <- ts
+
+
 
     processHands()
     processFingers()
     processTools()
     processGestures()
+    processScreenTaps()
+    processKeyTaps()
+    processCircle()
+    processSwipe()

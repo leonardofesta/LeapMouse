@@ -59,8 +59,6 @@ let moving_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFea
            controller.movemouse(element.D1,element.D2)
            |>ignore
 
-       System.Console.WriteLine("mouse mosso")
-
 let leftclick_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
         System.Console.WriteLine("Leftclickhandler")
         controller.LeftClickmouse()

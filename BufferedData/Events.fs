@@ -5,6 +5,9 @@ open BufferData.IData
 open BufferData.Data
 open BufferData.TData
 
+exception DataBufferIDExists of string
+exception DataBufferNotFound of string
+
 // The f function will raise the T event if needed
 type TEvent<'X,'V> (triggerfun : 'V -> bool, ?active: bool, ?name:string)=
     inherit Event<'X>()
@@ -60,3 +63,37 @@ type EventBuffer<'T,'W,'U> when 'T :> BufferedData<'W> and 'W :> Data<'U> (data:
             |>Seq.filter( fun x -> (x.IsActive() && x.CheckFun(data)))
             |>Seq.iter(fun x ->x.Trigger(data))
 
+
+type EventsBuffer<'T,'W,'U> when 'T :> BufferedData<'W> and 'W :> Data<'U> ()  =
+
+    let eventlist = new List<TEvent<_,_>>()
+    let datalist = new Dictionary<int,'T>()
+ 
+    member this.AddDataBuffer(id:int, buff:'T) = 
+                    if (datalist.ContainsKey(id)) then 
+                                                       raise (DataBufferIDExists("ID Già esistente")) 
+                                                  else 
+                                                       datalist.Add(id,buff)
+ 
+    member this.addEvent(t:TEvent<_,_>) = eventlist.Add(t)
+
+    member this.AddItem(id:int,d:'W,filter:'W -> bool) = 
+        
+        if not(datalist.ContainsKey(id)) then raise (DataBufferNotFound("il buffer con quell'id non esiste"))
+        
+        let databuffer = datalist.Item(id)
+        databuffer.AddItem(d,filter)
+        this.checkevents()
+
+    member this.AddItem(id,int,d:'W) =
+        if not(datalist.ContainsKey(id)) then raise (DataBufferNotFound("il buffer con quell'id non esiste"))
+        
+        let databuffer = datalist.Item(id)
+        databuffer.AddItem(d)  
+    
+        this.checkevents()
+
+    member private this.checkevents() = 
+        eventlist
+            |>Seq.filter(fun x-> (x.IsActive() && x.CheckFun(datalist)))
+            |>Seq.iter(fun x-> x.Trigger(datalist))

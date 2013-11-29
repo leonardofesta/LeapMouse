@@ -12,12 +12,12 @@ type Delegate = delegate of unit -> unit
 extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
 type LMController(app:TrayApplication) = 
     let mutable fingerid = -1
-    let mutable left   = -300.0
-    let mutable top    = 601.0
-    let mutable right  = 300.0
-    let mutable bottom = 1.0
-    let mutable LeapH  = 599.0
-    let mutable LeapW  = 600.0
+    let mutable left   = -400.0
+    let mutable top    = 800.0
+    let mutable right  = 400.0
+    let mutable bottom = 5.0
+    let mutable LeapH  = 800.0
+    let mutable LeapW  = 800.0
     let mutable modifyTL = true
     let mutable modifyBR = true
 
