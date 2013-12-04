@@ -24,6 +24,8 @@ type LMController(app:TrayApplication) =
     let mutable mouseposX = 0L
     let mutable mouseposY = 0L
 
+    let mutable lastclick:System.DateTime = System.DateTime.Now.AddMinutes(-1.0)
+
 
     let desktopH = System.Windows.Forms.SystemInformation.VirtualScreen.Height
     let desktopW = System.Windows.Forms.SystemInformation.VirtualScreen.Width
@@ -78,5 +80,8 @@ type LMController(app:TrayApplication) =
                            else true
 
     member this.LeftClickmouse() = 
-        System.Console.WriteLine("mouse clickato")
-        MouseInteroperator.MouseLeftClick(mouseposX,mouseposY)
+        if (System.DateTime.Now.Subtract(lastclick).TotalMilliseconds > 400.0)
+            then
+            lastclick <- System.DateTime.Now.AddMilliseconds(0.0)
+            MouseInteroperator.MouseLeftClick(mouseposX,mouseposY)
+

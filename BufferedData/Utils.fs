@@ -100,3 +100,17 @@ let disteuclidea(coeff:float,vnoto:float,valore:float,timespan:float):float =
 //    System.Console.WriteLine(" coeff  = " + a.ToString() + " vnoto  = " + b.ToString() + " dim  = " + c.ToString() + " timespan  = " + d.ToString())
 //    System.Console.WriteLine("risultato ->" + result.ToString())
     result
+
+
+let continuity(mylist:list<'T> when 'T :> TData<_>, interval:float):bool =
+            if (mylist.Length < 2)
+                then 
+                   false
+                else
+                   let a = List.rev ((List.rev mylist).Tail)
+                   let secondlist = List.append ([(mylist.Head)]) a
+
+                   let timediff = List.map2 (fun x y -> ((x:>TData<_>).Time.Subtract((y:>TData<_>).Time)).TotalMilliseconds
+                                                        ) mylist secondlist
+
+                   List.forall(fun x -> x<interval) timediff

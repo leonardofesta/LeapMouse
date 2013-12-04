@@ -84,10 +84,24 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
     ///Calcola se la cardinalità dei dati nel buffer è maggiore/uguale di una certa soglia
     ///</summary>
     ///<param name="n">intero che rappresenta la soglia della cardinalità da controlalre</param>
-    ///<returns>True se il numero di item nel buffer è almeno n, False altrimenti</returns>   
+    ///<return>True se il numero di item nel buffer è almeno n, False altrimenti</return>   
     member this.Cardinality(n:int):Boolean = 
              n>=itemlist.Count
     
+
+
+    ///<summary>
+    ///Controlla che il buffer sta ricevendo dati per un periodo "timespan" con una certa continuità. 
+    ///utile per evitare falsi possitivi negli altri predicati
+    ///</summary>
+    ///<param name="timespan">float che rappresenta la soglia della cardinalità da controlalre</param>
+    ///<param name="interval">float rappresentante la distanza massima in millisecondi tra 2 eventi continui</param>
+    ///<return>True se il numero di item nel buffer è almeno n, False altrimenti</return>   
+    member this.IsContinuous(timespan:float, interval:float):Boolean =
+            let mylist = listcut( itemlist,timespan)
+            continuity(mylist,interval)
+            
+                    
     ///<summary>
     ///Calcola la distanza totale percorsa percorsa dato un intervallo di tempo, in millisecondi
     ///</summary>
@@ -114,6 +128,32 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
                     distance
                 else
                     0.0
+    
+    ///<summary>
+    ///Calcola la distanza totale percorsa percorsa dato un intervallo di tempo, in millisecondi
+    ///</summary>
+    ///<param name="timespan">Float che rappresenta il periodo in cui calcolare la distanza percorsa</param>
+    ///<returns>la distanza totale percorsa per ogni componente</returns>
+    member this.ComponentDistance(timespan:float):float = 
+            
+            let mutable datacp = listcut(itemlist, timespan)
+                                                             
+            if (Seq.length datacp >2)
+                then
+                    let mutable current = datacp.Head
+                    let mutable distance = 0.0
+                    datacp <- datacp.Tail
+                    while(not(datacp.IsEmpty))
+                        do
+                        distance <- Math.Abs(current.D1 - datacp.Head.D1) + distance
+                        current <- datacp.Head
+                        datacp <- datacp.Tail
+
+                    distance
+                else
+                    0.0
+    
+
 
     ///<summary>
     ///Calcola la velocità istantanea degli ultimi eventi negli ultimi 100ms
@@ -296,9 +336,29 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
                                                     member this.Info = (y:TData1D<'T>).Info
                                         })  d1buff  (this.GetArrayBuffer()) 
         Buffered1D(new List<TData1D<'T>>(valori))
-  
+     
+    ///<summary>
+    ///Fa un buffer contenente le differenze tra il dato acquisito rispetto al dato precedente preso in considerazione. 
+    ///Il primo dato viene confrontato con se stesso e sarà sempre 0
+    ///<param name=timespan> periodo di tempo da considerare
+    ///<return> Ritorna un buffer contenente una lista di dati raprresentanti le differenze tra il dato attuale e il dato precedente</return>
+    ///</summary>
+    member this.DifferenceVector(timespan:float):Buffered1D<'T> =
+        let listacorta = listcut(itemlist,timespan)
+        if (listacorta.Length>1) then
+            let a = List.rev ((List.rev listacorta).Tail)
+            let secondlist = List.append ([(listacorta.Head)]) a
 
-
+            let finallist = List.map2(fun x y -> {new TData1D<'T> with
+                                                        member this.D1 = ((x:TData1D<'T>).D1-(y:TData1D<'T>).D1)
+                                                        member this.Time = (x:TData1D<'T>).Time
+                                                        member this.Info = (x:TData1D<'T>).Info   
+                                                 }) listacorta secondlist
+        
+            let x = new Buffered1D<'T>(new List<TData1D<'T>>(finallist))
+            x
+        else
+            this // decidere se restituire qualcos'altro
 
 type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
     inherit BufferedData<TData2D<'T>>()
@@ -348,6 +408,20 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
                     (System.DateTime.Now.Subtract (primo.Time)).TotalMilliseconds
 
     ///<summary>
+    ///Controlla che il buffer sta ricevendo dati per un periodo "timespan" con una certa continuità. 
+    ///utile per evitare falsi possitivi negli altri predicati
+    ///</summary>
+    ///<param name="timespan">float che rappresenta la soglia della cardinalità da controlalre</param>
+    ///<param name="interval">float rappresentante la distanza massima in millisecondi tra 2 eventi continui</param>
+    ///<return>True se il numero di item nel buffer è almeno n, False altrimenti</return>   
+    member this.IsContinuous(timespan:float, interval:float):Boolean =
+            let mylist = listcut( itemlist,timespan)
+            continuity(mylist,interval)
+            
+
+
+
+    ///<summary>
     ///Calcola se la cardinalità dei dati nel buffer è maggiore/uguale di una certa soglia
     ///</summary>
     ///<param name="n">intero che rappresenta la soglia della cardinalità da controlalre</param>
@@ -355,6 +429,7 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
     member this.Cardinality(n:int):Boolean = 
              n>=itemlist.Count
     
+
 
 
     ///<summary>
@@ -400,6 +475,32 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
                 else
                     0.0 // TODO : Decidere cosa fare x quando non ho dettagli
 
+
+    ///<summary>
+    ///Calcola la distanza totale percorsa percorsa dato un intervallo di tempo, in millisecondi
+    ///</summary>
+    ///<param name="timespan">Float che rappresenta il periodo in cui calcolare la distanza percorsa</param>
+    ///<returns>la distanza totale percorsa</returns>
+    member this.ComponentDistance(timespan:float):float*float = 
+            
+            let mutable datacp = listcut(itemlist, timespan)
+            
+            if (Seq.length datacp >2)
+                then
+                    let mutable current = datacp.Head
+                    let mutable distanceX = 0.0
+                    let mutable distanceY = 0.0
+                    datacp <- datacp.Tail
+                    while(not(datacp.IsEmpty))
+                        do
+                        distanceX <- Math.Abs(current.D1 - datacp.Head.D1) + distanceX
+                        distanceY <- Math.Abs(current.D2 - datacp.Head.D2) + distanceY
+                        current <- datacp.Head
+                        datacp <- datacp.Tail
+
+                    distanceX,distanceY
+                else
+                    0.0,0.0 // TODO : Decidere cosa fare x quando non ho dettagli
 
 
 
@@ -555,8 +656,8 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
 
     
     ///<summary>
-    ///<param name=funzione> funzione per calcolare i valori da seguire (rispetto al tempo, float tempo --> timespan data)
-    ///<param name=funzione> funzione che verifica la proprietà richiesta, restituendo un bool
+    ///<param name=theoricfun> funzione per calcolare i valori da seguire (rispetto al tempo, float tempo --> timespan data)
+    ///<param name=checkingfun> funzione che verifica la proprietà richiesta, restituendo un bool
     ///<return> Ritorna un float con una percentuale (0.qualcosa) che rappresenta quante iterazioni sono ok</return>
     ///</summary>
     member this.FollowingFunction(theoricfun:(float -> TimespanData), checkingfun:((TimespanData*TimespanData) -> Boolean) , timespan:float) =    ///TODO : dare titolo
@@ -574,6 +675,29 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
 
         (float totvere)/ (float totale)
 
+    ///<summary>
+    ///Fa un buffer contenente le differenze tra il dato acquisito rispetto al dato precedente preso in considerazione. 
+    ///Il primo dato viene confrontato con se stesso e sarà sempre 0
+    ///<param name=timespan> periodo di tempo da considerare
+    ///<return> Ritorna un buffer contenente una lista di dati raprresentanti le differenze tra il dato attuale e il dato precedente</return>
+    ///</summary>
+    member this.DifferenceVector(timespan:float):Buffered2D<'T> =
+        let listacorta = listcut(itemlist,timespan)
+        if (listacorta.Length>1) then
+            let a = List.rev ((List.rev listacorta).Tail)
+            let secondlist = List.append ([(listacorta.Head)]) a
+
+            let finallist = List.map2(fun x y -> {new TData2D<'T> with
+                                                        member this.D1 = ((x:TData2D<'T>).D1-(y:TData2D<'T>).D1)
+                                                        member this.D2 = ((x:TData2D<'T>).D2-(y:TData2D<'T>).D2)
+                                                        member this.Time = (x:TData2D<'T>).Time
+                                                        member this.Info = (x:TData2D<'T>).Info   
+                                                 }) listacorta secondlist
+        
+            let x = new Buffered2D<'T>(new List<TData2D<'T>>(finallist))
+            x
+        else
+            this // decidere se restituire qualcos'altro
 
 
 type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
@@ -623,6 +747,18 @@ type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
                     let primo = itemlist.[0]
                     (System.DateTime.Now.Subtract (primo.Time)).TotalMilliseconds
 
+    ///<summary>
+    ///Controlla che il buffer sta ricevendo dati per un periodo "timespan" con una certa continuità. 
+    ///utile per evitare falsi possitivi negli altri predicati
+    ///</summary>
+    ///<param name="timespan">float che rappresenta la soglia della cardinalità da controlalre</param>
+    ///<param name="interval">float rappresentante la distanza massima in millisecondi tra 2 eventi continui</param>
+    ///<return>True se il numero di item nel buffer è almeno n, False altrimenti</return>   
+    member this.IsContinuous(timespan:float, interval:float):Boolean =
+            let mylist = listcut( itemlist,timespan)
+            continuity(mylist,interval)
+            
+
 
     ///<summary>
     ///Calcola se la cardinalità dei dati nel buffer è maggiore/uguale di una certa soglia
@@ -671,6 +807,34 @@ type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
                     0.0 // TODO : Decidere cosa fare x quando non ho dettagli
 
 
+    ///<summary>
+    ///Calcola la distanza totale percorsa percorsa dato un intervallo di tempo, in millisecondi
+    ///</summary>
+    ///<param name="timespan">Float che rappresenta il periodo in cui calcolare la distanza percorsa</param>
+    ///<returns>la distanza totale percorsa</returns>
+    member this.ComponentDistance(timespan:float):float*float*float = 
+            
+            let mutable datacp = listcut(itemlist, timespan)
+            
+            if (Seq.length datacp >2)
+                then
+                    let mutable current = datacp.Head
+                    let mutable distanceX = 0.0
+                    let mutable distanceY = 0.0
+                    let mutable distanceZ = 0.0
+                    datacp <- datacp.Tail
+                    while(not(datacp.IsEmpty))
+                        do
+                        distanceX <- Math.Abs(current.D1 - datacp.Head.D1) + distanceX
+                        distanceY <- Math.Abs(current.D2 - datacp.Head.D2) + distanceY
+                        distanceZ <- Math.Abs(current.D3 - datacp.Head.D3) + distanceZ
+
+                        current <- datacp.Head
+                        datacp <- datacp.Tail
+
+                    distanceX,distanceY,distanceZ
+                else
+                    0.0,0.0,0.0 // TODO : Decidere cosa fare x quando non ho dettagli
 
 
 
@@ -835,8 +999,8 @@ type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
 
 
     ///<summary>
-    ///<param name=funzione> funzione per calcolare i valori da seguire (rispetto al tempo, float tempo --> timespan data)
-    ///<param name=funzione> funzione che verifica la proprietà richiesta, restituendo un bool
+    ///<param name=theoricfun> funzione per calcolare i valori da seguire (rispetto al tempo, float tempo --> timespan data)
+    ///<param name=checkingfun> funzione che verifica la proprietà richiesta, restituendo un bool
     ///<return> Ritorna un float con una percentuale (0.qualcosa) che rappresenta quante iterazioni sono ok</return>
     ///</summary>
     member this.FollowingFunction(theoricfun:(float -> TimespanData), checkingfun:((TimespanData*TimespanData) -> Boolean) , timespan:float) =    ///TODO : dare titolo
@@ -853,4 +1017,29 @@ type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
                if checkingfun( listatimeshift.[i],listafunzione.[i]) then totvere <- totvere+1
 
         (float totvere)/ (float totale)
-    
+
+
+    ///<summary>
+    ///Fa un buffer contenente le differenze tra il dato acquisito rispetto al dato precedente preso in considerazione. 
+    ///Il primo dato viene confrontato con se stesso e sarà sempre 0
+    ///<param name=timespan> periodo di tempo da considerare
+    ///<return> Ritorna un buffer contenente una lista di dati raprresentanti le differenze tra il dato attuale e il dato precedente</return>
+    ///</summary>
+    member this.DifferenceVector(timespan:float):Buffered3D<'T> =
+        let listacorta = listcut(itemlist,timespan)
+        if (listacorta.Length>1) then
+            let a = List.rev ((List.rev listacorta).Tail)
+            let secondlist = List.append ([(listacorta.Head)]) a
+
+            let finallist = List.map2(fun x y -> {new TData3D<'T> with
+                                                        member this.D1 = ((x:TData3D<'T>).D1-(y:TData3D<'T>).D1)
+                                                        member this.D2 = ((x:TData3D<'T>).D2-(y:TData3D<'T>).D2)
+                                                        member this.D3 = ((x:TData3D<'T>).D3-(y:TData3D<'T>).D3)
+                                                        member this.Time = (x:TData3D<'T>).Time
+                                                        member this.Info = (x:TData3D<'T>).Info   
+                                                 }) listacorta secondlist
+        
+            let x = new Buffered3D<'T>(new List<TData3D<'T>>(finallist))
+            x
+        else
+            this // decidere se restituire qualcos'altro

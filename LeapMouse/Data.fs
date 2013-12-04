@@ -48,3 +48,6 @@ open BufferData.IData
                 | Stabile2 = 5
                 | Calibrato = 6
                 | LClick = 7
+                | Rotate = 8
+                | ZoomOut = 9
+                | ZoomIn = 10

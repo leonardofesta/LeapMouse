@@ -34,32 +34,41 @@ let main argv =
     let buff = new Buffered2D<_>()
     let evbuffer = new EventBuffer<_,_,_>(buff)
 
+    let buffz = new Buffered3D<_>()
+    let evbufz = new EventBuffer<_,_,_>(buffz)
+
     let handlingfun:(LeapSensorEventArgs -> unit) = fun t -> let fingerlist = t.ActivityFingers
                                                              if (List.length fingerlist = 1) then
                                                                                                  let a = new Td2d(float fingerlist.Head.StabilizedTipPosition.x, float fingerlist.Head.StabilizedTipPosition.y, new FingerInfo(fingerlist.Head.Id))
                                                                                                  evbuffer.AddItem(a)
 
-
+    let hfunz :(LeapSensorEventArgs -> unit ) = fun t -> let fingerlist = t.ActivityFingers
+                                                         if (List.length fingerlist = 1) then 
+                                                                                                let a = new Td3d(float fingerlist.Head.StabilizedTipPosition.x, float fingerlist.Head.StabilizedTipPosition.y, float fingerlist.Head.StabilizedTipPosition.z, new FingerInfo(fingerlist.Head.Id))
+                                                                                                evbufz.AddItem(a)     
 
     let StationaryEvent  = new TEvent<_,_> (stationary (4000.0,40.0),true,"DitoStazionario")
     let StationaryEvent2 = new TEvent<_,_> (stationary (3000.0,40.0),true,"DitoStazionario2")
     let StopModifica     = new TEvent<_,_> (( fun x-> true ), true, "stopmodifica")
     let MovingEvent      = new TEvent<_,_> ((fun x -> true), true, "muovendo")
+    let Clickevt         = new TEvent<_,_> (clickevt(700.0),true, "clickando")
+
 
     evbuffer.addEvent(StationaryEvent)
     evbuffer.addEvent(MovingEvent)
     evbuffer.addEvent(StationaryEvent2)
     evbuffer.addEvent(StopModifica)
-
+    evbufz.addEvent(Clickevt)
 
     leap.ActiveFinger.Add(handlingfun)
-    sensor.Listen(LeapFeatureTypes.Stabile  , StationaryEvent.Publish |> Event.map(fun x->x :> System.EventArgs))
-    sensor.Listen(LeapFeatureTypes.Stabile2 , StationaryEvent2.Publish |> Event.map(fun x-> x :> System.EventArgs))
-    sensor.Listen(LeapFeatureTypes.NewFinger, leap.NewFinger |> Event.map(fun x->x :> System.EventArgs))
-    sensor.Listen(LeapFeatureTypes.Moving, MovingEvent.Publish |> Event.map(fun x->x :> System.EventArgs)) 
-    sensor.Listen(LeapFeatureTypes.Calibrato, StopModifica.Publish |> Event.map ( fun x -> x :> System.EventArgs))
-    sensor.Listen(LeapFeatureTypes.LClick, leap.NewScreenTapGesture |> Event.map (fun x-> x :> System.EventArgs))
-    
+    leap.ActiveFinger.Add(hfunz)
+    sensor.Listen( LeapFeatureTypes.Stabile   , StationaryEvent.Publish |> Event.map(fun x->x :> System.EventArgs))
+    sensor.Listen( LeapFeatureTypes.Stabile2  , StationaryEvent2.Publish |> Event.map(fun x-> x :> System.EventArgs))
+    sensor.Listen( LeapFeatureTypes.NewFinger , leap.NewFinger |> Event.map(fun x->x :> System.EventArgs))
+    sensor.Listen( LeapFeatureTypes.Moving    , MovingEvent.Publish |> Event.map(fun x->x :> System.EventArgs)) 
+    sensor.Listen( LeapFeatureTypes.Calibrato , StopModifica.Publish |> Event.map ( fun x -> x :> System.EventArgs))
+    sensor.Listen( LeapFeatureTypes.LClick    , Clickevt.Publish |> Event.map (fun x-> x :> System.EventArgs))
+ 
 
     leap.Connect() |> ignore
     eventi.ToGestureNet(sensor) |> ignore
