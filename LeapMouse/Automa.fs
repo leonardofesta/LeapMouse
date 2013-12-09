@@ -28,7 +28,7 @@ let eventbuilder( app:_,cont:LMController) =
 
 //    let leftclicks  =   lclick |-> leftclick_h app cont              
     
-    let events = nuovodito |>> !*(leftclicks |^| rightclicks)
+    let events = (leftclicks |^| rightclicks)
     
     events
 

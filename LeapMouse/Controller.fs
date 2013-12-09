@@ -25,7 +25,8 @@ type LMController(app:TrayApplication) =
     let mutable mouseposY = 0L
 
     let mutable lastclick:System.DateTime = System.DateTime.Now.AddMinutes(-1.0)
-
+    let mutable leftclicked:Boolean = false
+    let mutable rightcliked:Boolean = false
 
     let desktopH = System.Windows.Forms.SystemInformation.VirtualScreen.Height
     let desktopW = System.Windows.Forms.SystemInformation.VirtualScreen.Width
@@ -86,13 +87,25 @@ type LMController(app:TrayApplication) =
             MouseInteroperator.MouseLeftClick(mouseposX,mouseposY)
 
     member this.RightClickDown() =
-        MouseInteroperator.MouseRightClickDown(mouseposX,mouseposY)
+        if not(rightcliked)
+            then
+                rightcliked <- true
+                MouseInteroperator.MouseRightClickDown(mouseposX,mouseposY)
     
     member this.RightClickUp() = 
-        MouseInteroperator.MouseRightClickUp(mouseposX,mouseposY)
+        if rightcliked
+            then
+                rightcliked <- false
+                MouseInteroperator.MouseRightClickUp(mouseposX,mouseposY)
 
     member this.LeftClickDown() =
-        MouseInteroperator.MouseLeftClickDown(mouseposX,mouseposY)
+        if not(leftclicked) 
+            then
+                leftclicked <- true
+                MouseInteroperator.MouseLeftClickDown(mouseposX,mouseposY)
     
     member this.LeftClickUp() = 
-        MouseInteroperator.MouseLeftClickUp(mouseposX,mouseposY)
+        if leftclicked 
+            then
+                leftclicked <- false
+                MouseInteroperator.MouseLeftClickUp(mouseposX,mouseposY)

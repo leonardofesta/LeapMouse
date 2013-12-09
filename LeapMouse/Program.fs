@@ -8,6 +8,7 @@ open GestIT.Leap
 open BufferData.IData
 open BufferData.Events
 open BufferData.TData
+open System.Collections.Generic
 open System.Windows.Forms
 open System.Runtime.InteropServices
 open LeapMouse.Data
@@ -40,10 +41,21 @@ let main argv =
     let buffz = new Buffered3D<_>()
     let evbufz = new EventBuffer<_,_,_>(buffz)
 
+    let totalfingers:(Leap.Hand -> float) = fun t ->   let hd = t.Direction
+                                                       let fingerlist = t.Fingers
+                                                       let finger_list = new List<Leap.Finger>()
+                                                       for finger in fingerlist 
+                                                            do finger_list.Add(finger)
+                                                       finger_list
+                                                       |> Seq.filter (fun x -> ((float ((x:Leap.Finger).Direction.AngleTo(hd)) * 57.3 )> 30.0 )) 
+                                                       |> Seq.length 
+                                                       |> float
+               
     let rightclickhandler:(LeapSensorEventArgs -> unit) = fun t -> let fingerlist = t.ActivityFingers
                                                                    let handlist = t.ActivityHands
                                                                    if (List.length handlist = 1) then
-                                                                                                    new Td1d(float handlist.Head.Fingers.Count, new FingerInfo(handlist.Head.Id))
+                                                                                                    let x = handlist.Head
+                                                                                                    new Td1d(totalfingers handlist.Head, new FingerInfo(handlist.Head.Id))
                                                                                                     |>rightevbuffer.AddItem
 
     let handlingfun:(LeapSensorEventArgs -> unit) = fun t -> let fingerlist = t.ActivityFingers
@@ -56,11 +68,11 @@ let main argv =
                                                                                                 new Td3d(float fingerlist.Head.StabilizedTipPosition.x, float fingerlist.Head.StabilizedTipPosition.y, float fingerlist.Head.StabilizedTipPosition.z, new FingerInfo(fingerlist.Head.Id))
                                                                                                 |> evbufz.AddItem     
 
+
     let StationaryEvent  = new TEvent<_,_> (stationary (4000.0,40.0),true,"DitoStazionario")
     let StationaryEvent2 = new TEvent<_,_> (stationary (3000.0,40.0),true,"DitoStazionario2")
-    let StopModifica     = new TEvent<_,_> (( fun x-> true ), true, "stopmodifica")
+    let StopModifica     = new TEvent<_,_> ((fun x -> true), true, "stopmodifica")
     let MovingEvent      = new TEvent<_,_> ((fun x -> true), true, "muovendo")
-    let Clickevt         = new TEvent<_,_> (clickevt(700.0),true, "clickando")
 
     let RightClickDown   = new TEvent<_,_> (rightclickdown(),true,"rightclickdown")
     let RightClickUp     = new TEvent<_,_> (rightclickup(),true,"rightclickdown")
@@ -73,7 +85,6 @@ let main argv =
     evbuffer.addEvent(MovingEvent)
     evbuffer.addEvent(StationaryEvent2)
     evbuffer.addEvent(StopModifica)
-//    evbufz.addEvent(Clickevt)
     evbufz.addEvent(LeftClickDown)
     evbufz.addEvent(LeftClickUp)
     rightevbuffer.addEvent(RightClickDown)
@@ -88,7 +99,6 @@ let main argv =
     sensor.Listen( LeapFeatureTypes.NewFinger , leap.NewFinger           |> Event.map(fun x -> x :> System.EventArgs))
     sensor.Listen( LeapFeatureTypes.Moving    , MovingEvent.Publish      |> Event.map(fun x -> x :> System.EventArgs)) 
     sensor.Listen( LeapFeatureTypes.Calibrato , StopModifica.Publish     |> Event.map(fun x -> x :> System.EventArgs))
-    sensor.Listen( LeapFeatureTypes.LClick    , Clickevt.Publish         |> Event.map(fun x -> x :> System.EventArgs))
     sensor.Listen( LeapFeatureTypes.RClickDown, RightClickDown.Publish   |> Event.map(fun x -> x :> System.EventArgs))
     sensor.Listen( LeapFeatureTypes.RClickUp  , RightClickUp.Publish     |> Event.map(fun x -> x :> System.EventArgs))
     sensor.Listen( LeapFeatureTypes.LClickDown, LeftClickDown.Publish    |> Event.map(fun x -> x :> System.EventArgs))

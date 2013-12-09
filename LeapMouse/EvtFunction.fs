@@ -42,7 +42,7 @@ let leftclickdown(timespan) = fun buffer ->    let bb = (buffer:Buffered3D<_>)
 //                                               System.Console.WriteLine("distanza totale " + zdist.ToString())
 //                                               System.Console.WriteLine("zdirection " + zdirection.ToString() + " zover  " + zover0.ToString())
 //                                               System.Console.WriteLine("periodlenght>timespan + contiunous  "+ (bb.PeriodLength()> timespan).ToString() + "  " + bb.IsContinuous(timespan,100.0).ToString() )
-                                               System.Console.WriteLine("direzioni retta" + grad.[2].ToString())
+//                                               System.Console.WriteLine("direzioni retta" + grad.[2].ToString())
                                                if (zdist>50.0 && grad.[2] < -300.0 && zunder0 && x1+y1<Math.Abs(z1-10.0) &&
                                                    bb.PeriodLength()> timespan && bb.IsContinuous(timespan,100.0)
                                                    ) 
