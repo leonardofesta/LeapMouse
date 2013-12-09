@@ -101,6 +101,12 @@ let disteuclidea(coeff:float,vnoto:float,valore:float,timespan:float):float =
 //    System.Console.WriteLine("risultato ->" + result.ToString())
     result
 
+let printfloat (mylist:list<float>):String = 
+    let mutable stringa = ""
+    for x in (List.map (fun x -> x.ToString()) mylist) do
+        stringa <- stringa+" "+x
+
+    stringa
 
 let continuity(mylist:list<'T> when 'T :> TData<_>, interval:float):bool =
             if (mylist.Length < 2)
@@ -109,8 +115,6 @@ let continuity(mylist:list<'T> when 'T :> TData<_>, interval:float):bool =
                 else
                    let a = List.rev ((List.rev mylist).Tail)
                    let secondlist = List.append ([(mylist.Head)]) a
-
                    let timediff = List.map2 (fun x y -> ((x:>TData<_>).Time.Subtract((y:>TData<_>).Time)).TotalMilliseconds
                                                         ) mylist secondlist
-
                    List.forall(fun x -> x<interval) timediff

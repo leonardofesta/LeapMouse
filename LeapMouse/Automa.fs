@@ -13,17 +13,23 @@ let eventbuilder( app:_,cont:LMController) =
     let fermo2     = new GroundTerm<_,_>(LeapFeatureTypes.Stabile2)
     let moving     = new GroundTerm<_,_>(LeapFeatureTypes.Moving)
     let stopmodify = new GroundTerm<_,_>(LeapFeatureTypes.Calibrato)
-    let lclick      = new GroundTerm<_,_>(LeapFeatureTypes.LClick)
-   
+    let lclick     = new GroundTerm<_,_>(LeapFeatureTypes.LClick)
+    let rclickDown = new GroundTerm<_,_>(LeapFeatureTypes.RClickDown)
+    let rclickUp   = new GroundTerm<_,_>(LeapFeatureTypes.RClickUp)
+    let lclickDown = new GroundTerm<_,_>(LeapFeatureTypes.LClickDown)
+    let lclickUp   = new GroundTerm<_,_>(LeapFeatureTypes.LClickUp)
 //    let start = new GroundTerm<_,_>(LeapFeatureTypes.NewHand)
 
-//    let events = ((nuovodito |-> setcalibratingfinger_h app cont) |>> (fermo |-> standingTL_h app cont ) |>> (fermo2 |-> standingLR_h app cont ) |>> (stopmodify |-> nomod_h app cont) |>> !*((moving |-> moving_h app cont)|^| (lclick |-> leftclick_h app cont )) )
-//    let calibrazione = (fermo2 |-> standingTL_h app cont) |>> (fermo |-> standingLR_h app cont)
-    let events = !*(//(moving |-> moving_h app cont)|^| 
-                    (lclick |-> leftclick_h app cont )) 
+//    let events = ((nuovodito |-> setcalibratingfinger_h app cont) |>> (fermo |-> standingTL_h app cont ) |>> (fermo2 |-> standingLR_h app cont ) |>> (stopmodify |-> nomod_h app cont))
+    
+    let movement = moving |-> moving_h app cont
+    let rightclicks =   ((rclickDown |-> rightclickdown_h cont) |>> (rclickUp |-> rightclickup_h cont) )
+    let leftclicks  =   ((lclickDown |-> leftclickdown_h cont) |>> (lclickUp |-> leftclickup_h cont) )
 
-//    nuovodito |-> ditoapparso_h app
-
+//    let leftclicks  =   lclick |-> leftclick_h app cont              
+    
+    let events = nuovodito |>> !*(leftclicks |^| rightclicks)
+    
     events
 
 let calibrazionebuilder( app:_, cont:LMController) = 
@@ -46,7 +52,7 @@ let movingmousebuilder(app:_, cont:LMController) =
     let moving = new GroundTerm<_,_>(LeapFeatureTypes.Moving)
 
     let movingnet = (nuovodito |-> ditoapparso_h app cont) |>> !*(moving |-> moving_h app cont)
-
+     
     movingnet
 
 let fingerbuilder(app:_, cont:LMController) = 

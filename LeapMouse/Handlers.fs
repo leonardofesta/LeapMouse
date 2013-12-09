@@ -62,3 +62,22 @@ let moving_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFea
 let leftclick_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
         System.Console.WriteLine("Leftclickhandler")
         controller.LeftClickmouse()
+
+
+let leftclickdown_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
+        System.Console.WriteLine("LeftClickDown")
+        controller.LeftClickDown()
+
+
+let leftclickup_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
+        System.Console.WriteLine("LeftClickUp")
+        controller.LeftClickUp()
+
+let rightclickdown_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
+        System.Console.WriteLine("RightClickDown")
+        controller.RightClickDown()
+
+
+let rightclickup_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
+        System.Console.WriteLine("RightClickUp")
+        controller.RightClickUp()

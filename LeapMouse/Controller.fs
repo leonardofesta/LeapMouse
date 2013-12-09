@@ -85,3 +85,14 @@ type LMController(app:TrayApplication) =
             lastclick <- System.DateTime.Now.AddMilliseconds(0.0)
             MouseInteroperator.MouseLeftClick(mouseposX,mouseposY)
 
+    member this.RightClickDown() =
+        MouseInteroperator.MouseRightClickDown(mouseposX,mouseposY)
+    
+    member this.RightClickUp() = 
+        MouseInteroperator.MouseRightClickUp(mouseposX,mouseposY)
+
+    member this.LeftClickDown() =
+        MouseInteroperator.MouseLeftClickDown(mouseposX,mouseposY)
+    
+    member this.LeftClickUp() = 
+        MouseInteroperator.MouseLeftClickUp(mouseposX,mouseposY)

@@ -50,7 +50,6 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
     
     override this.AddItem(d:TData1D<'T>) = 
         itemlist.Add (d)
-        System.Console.WriteLine("Elemento aggiunto " + d.D1.ToString() + "  con tempo  " + d.Time.ToString())
 #if Reading
         //Evitare di fare il remove all inserendo eventi con orari arbitrari sarebbero cancellati
 #else

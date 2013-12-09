@@ -51,3 +51,9 @@ open BufferData.IData
                 | Rotate = 8
                 | ZoomOut = 9
                 | ZoomIn = 10
+                | RClickDown = 11
+                | RClickUp = 12
+                | LClickDown = 13
+                | LClickUp = 14
+ 
+

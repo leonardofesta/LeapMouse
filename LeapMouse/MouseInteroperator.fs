@@ -21,4 +21,15 @@ let MouseLeftClick (xDelta:int64, yDelta:int64) =
     mouse_event(MOUSEEVENTF_LEFTDOWN, xDelta, yDelta, 0L, 0L)
     mouse_event(MOUSEEVENTF_LEFTUP, xDelta, yDelta, 0L, 0L)
 
+let MouseRightClickDown (xDelta:int64, yDelta:int64) = 
+    mouse_event(MOUSEEVENTF_RIGHTDOWN, xDelta, yDelta, 0L, 0L)
+
+let MouseRightClickUp (xDelta:int64, yDelta:int64) = 
+    mouse_event(MOUSEEVENTF_RIGHTUP, xDelta, yDelta, 0L, 0L)
+
+let MouseLeftClickDown (xDelta:int64, yDelta:int64) = 
+    mouse_event(MOUSEEVENTF_LEFTDOWN, xDelta, yDelta, 0L, 0L)
+
+let MouseLeftClickUp (xDelta:int64, yDelta:int64) = 
+    mouse_event(MOUSEEVENTF_LEFTUP, xDelta, yDelta, 0L, 0L)
     
