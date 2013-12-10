@@ -18,18 +18,16 @@ let eventbuilder( app:_,cont:LMController) =
     let rclickUp   = new GroundTerm<_,_>(LeapFeatureTypes.RClickUp)
     let lclickDown = new GroundTerm<_,_>(LeapFeatureTypes.LClickDown)
     let lclickUp   = new GroundTerm<_,_>(LeapFeatureTypes.LClickUp)
-//    let start = new GroundTerm<_,_>(LeapFeatureTypes.NewHand)
 
-//    let events = ((nuovodito |-> setcalibratingfinger_h app cont) |>> (fermo |-> standingTL_h app cont ) |>> (fermo2 |-> standingLR_h app cont ) |>> (stopmodify |-> nomod_h app cont))
-    
-    let movement = moving |-> moving_h app cont
-    let rightclicks =   ((rclickDown |-> rightclickdown_h cont) |>> (rclickUp |-> rightclickup_h cont) )
-    let leftclicks  =   ((lclickDown |-> leftclickdown_h cont) |>> (lclickUp |-> leftclickup_h cont) )
 
-//    let leftclicks  =   lclick |-> leftclick_h app cont              
+    let calibrating = ((nuovodito |-> setcalibratingfinger_h app cont) |>> (fermo |-> standingTL_h app cont ) |>> (fermo2 |-> standingLR_h app cont ) |>> (stopmodify |-> nomod_h app cont))
+  
+    let movement = !*(moving |-> moving_h app cont)
+    let rightclicks =  !* ((rclickDown |-> rightclickdown_h cont) |>> (rclickUp |-> rightclickup_h cont) )
+    let leftclicks  =  !* ((lclickDown |-> leftclickdown_h cont)  |>> (lclickUp |-> leftclickup_h cont) )
     
-    let events = (leftclicks |^| rightclicks)
-    
+    let events = calibrating |>> (movement |^| leftclicks |^| rightclicks)
+
     events
 
 let calibrazionebuilder( app:_, cont:LMController) = 

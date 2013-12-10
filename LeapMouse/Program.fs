@@ -47,9 +47,11 @@ let main argv =
                                                        for finger in fingerlist 
                                                             do finger_list.Add(finger)
                                                        finger_list
-                                                       |> Seq.filter (fun x -> ((float ((x:Leap.Finger).Direction.AngleTo(hd)) * 57.3 )> 30.0 )) 
+                                                       |> Seq.filter (fun x -> ((float ((x:Leap.Finger).Direction.AngleTo(hd)) * 57.3 )< 30.0 )) 
                                                        |> Seq.length 
                                                        |> float
+                                                       |> fun x -> System.Console.WriteLine("valore x " + x.ToString())
+                                                                   x
                
     let rightclickhandler:(LeapSensorEventArgs -> unit) = fun t -> let fingerlist = t.ActivityFingers
                                                                    let handlist = t.ActivityHands
@@ -75,11 +77,9 @@ let main argv =
     let MovingEvent      = new TEvent<_,_> ((fun x -> true), true, "muovendo")
 
     let RightClickDown   = new TEvent<_,_> (rightclickdown(),true,"rightclickdown")
-    let RightClickUp     = new TEvent<_,_> (rightclickup(),true,"rightclickdown")
-
+    let RightClickUp     = new TEvent<_,_> (rightclickup()  ,true,"rightclickdown")
     let LeftClickDown    = new TEvent<_,_> (leftclickdown(300.0),true,"leftclickdown")
-    let LeftClickUp      = new TEvent<_,_> (leftclickup(200.0),true,"leftclickup")
-
+    let LeftClickUp      = new TEvent<_,_> (leftclickup(200.0)  ,true,"leftclickup")
 
     evbuffer.addEvent(StationaryEvent)
     evbuffer.addEvent(MovingEvent)

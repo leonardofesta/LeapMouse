@@ -47,7 +47,7 @@ let leftclickdown(timespan) = fun buffer ->    let bb = (buffer:Buffered3D<_>)
                                                    bb.PeriodLength()> timespan && bb.IsContinuous(timespan,100.0)
                                                    ) 
                                                    then 
-                                                       true// true
+                                                       true
                                                    else 
                                                         false
 (*                                               if ((float zdirection.Length > 0.9* (float (x.GetListBuffer().Length))) && last.D3< -50.0 && x1 <3.0 && y1 <3.0 && zdist>60.0 && 
