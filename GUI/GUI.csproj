@@ -7,7 +7,7 @@
     <ProjectGuid>{1ED2F01A-78A1-4846-8914-FE9326610B1C}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GUI</RootNamespace>
+    <RootNamespace>LeapMouse.GUI</RootNamespace>
     <AssemblyName>GUI</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

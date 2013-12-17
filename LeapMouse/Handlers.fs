@@ -15,8 +15,9 @@ let standingTL_h (app:TrayApplication) (contr:LMController) (sender:_, f:LeapFea
 
        ee.Clear()
        contr.setmouseTopLeft(element.D1,element.D2)
-       app.Invoke(new Delegate(fun () -> app.PopText("alto a sinistra ok")
-                                         ))
+       contr.OpenPopupCalibration2()
+//       app.Invoke(new Delegate(fun () -> app.PopText("alto a sinistra ok")
+//                                         ))
        |>ignore
        System.Console.WriteLine("angolotopleft")
 
@@ -26,13 +27,15 @@ let standingLR_h (app:TrayApplication) (contr:LMController) (sender:_,f:LeapFeat
 
        ee.Clear()
        contr.setmouseBottomRight(element.D1,element.D2)
-       app.Invoke(new Delegate(fun () -> app.PopText("basso destra ok")
-                                         ))
+//       app.Invoke(new Delegate(fun () -> app.PopText("basso destra ok")
+//                                         ))
+/// TODO VEDERE SE FARE ALTRO POPUP ... 
        |>ignore
        System.Console.WriteLine("angolobottomright")
 
 let ditoapparso_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
-       app.Invoke(new Delegate(fun () -> app.PopText("dito trovato")))
+//       app.Invoke(new Delegate(fun () -> app.PopText("dito trovato")))
+       controller.OpenPopupCalibration1()
        |>ignore
        System.Console.WriteLine("dito trovato")
 
@@ -49,7 +52,7 @@ let setcalibratingfinger_h (app:TrayApplication) (controller:LMController) (send
        System.Console.WriteLine("dito trovato")
 
 
-let moving_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
+let moving_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
 
        let ee = (e:?> Buffered2D<FingerInfo>).GetListBuffer()
 

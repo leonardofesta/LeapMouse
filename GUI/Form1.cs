@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace GUI
+namespace LeapMouse.GUI
 {
 
     public partial class Form1 : Form
@@ -19,12 +19,13 @@ namespace GUI
         {
             InitializeComponent();
         }
-        public static const int GREEN = 0;
-        public static const int YELLOW = 1;
-        public static const int RED = 2;
 
-        public static const int BUTTONSTART = 0;
-        public static const int BUTTONSTOP  = 1;
+        public const int GREEN = 0;
+        public const int YELLOW = 1;
+        public const int RED = 2;
+
+        public const int BUTTONSTART = 0;
+        public const int BUTTONSTOP = 1;
 
         public event EventHandler CalibrationClickEvt;
         public event EventHandler StartStopClickEvt;

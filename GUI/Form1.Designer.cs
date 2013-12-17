@@ -1,4 +1,4 @@
-﻿namespace GUI
+﻿namespace LeapMouse.GUI
 {
     partial class Form1
     {

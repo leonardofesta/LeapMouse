@@ -5,28 +5,37 @@ module LeapMouse.Start
 open GestIT
 open GestIT.FSharp
 open GestIT.Leap
-open GUI
 open BufferData.IData
 open BufferData.Events
 open BufferData.TData
 open System.Collections.Generic
 open System.Windows.Forms
 open System.Runtime.InteropServices
+open LeapMouse.GUI
 open LeapMouse.Data
 open LeapMouse.FrameApplication
 open LeapMouse.Automa
 open LeapMouse.EvtFunction
 open LeapMouse.Controller
 
+    
+
+
 
 [<EntryPoint>]
 let main argv = 
     let sensor = new FusionSensor<LeapFeatureTypes,System.EventArgs>()
     let app = new TrayApplication()
-    let controller = new LMController(app)
+    
     let gui = new Form1()
-    // let calibrazione = calibrazionebuilder(app,controller)
+    let controller = new LMController(gui)
+    let calibrazione = calibrazionebuilder(app,controller)
+    
     let eventi = eventbuilder(app,controller)
+    
+    let netshandler = new NetHandler(calibrazione,eventi,sensor)
+    controller.setNets(netshandler)
+
     let leap = new LeapSensor()
 //    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPESCREENTAP)
 //    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPECIRCLE)

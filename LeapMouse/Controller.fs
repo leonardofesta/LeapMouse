@@ -4,13 +4,43 @@ open LeapMouse.FrameApplication
 open System.Windows.Forms
 open System
 open LeapMouse.MouseInteroperator
-
+open LeapMouse.Data
+open GestIT.FSharp
+open GestIT
+open LeapMouse.GUI
 
 type Delegate = delegate of unit -> unit
 
+ type NetHandler(calibration:GestureExpr<LeapFeatureTypes,_>, movement:GestureExpr<LeapFeatureTypes,_>, sensor:FusionSensor<LeapFeatureTypes,_>) = 
+       
+     let mutable calibrationnet = None
+     let mutable movementnet = None
+
+     member this.StartCalibration() = 
+            calibrationnet <- calibration.ToNet(sensor) |> Some
+            
+     member this.StartMovement() = 
+            movementnet <- movement.ToNet(sensor) |> Some
+
+     
+     member this.StopCalibration() = 
+            match calibrationnet with 
+                         | Some t -> (t :> System.IDisposable).Dispose()
+                         | None   -> ()
+            |> ignore
+
+
+     member this.StopMovement() = 
+            match movementnet with 
+                         | Some t -> (t :> System.IDisposable).Dispose()
+                         | None   -> ()
+            |> ignore
+
+
 
 extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
-type LMController(app:TrayApplication) = 
+
+type LMController(app:Form1) = 
     let mutable fingerid = -1
     let mutable left   = -400.0
     let mutable top    = 800.0
@@ -31,6 +61,11 @@ type LMController(app:TrayApplication) =
     let desktopH = System.Windows.Forms.SystemInformation.VirtualScreen.Height
     let desktopW = System.Windows.Forms.SystemInformation.VirtualScreen.Width
 
+    let mutable netHandler = None
+
+    member this.setNets(nets:NetHandler) = 
+        netHandler <- nets |> Some 
+    
     member this.setmouseTopLeft(xvar:float,yvar:float) = 
         if (modifyTL) then
             left<- xvar
@@ -45,7 +80,7 @@ type LMController(app:TrayApplication) =
                 LeapW <- Math.Abs(top - bottom)
                 modifyBR<- false
 
-
+    
     member this.Modify(b:bool) = 
         modifyTL <- b
         modifyBR <- b
@@ -109,3 +144,34 @@ type LMController(app:TrayApplication) =
             then
                 leftclicked <- false
                 MouseInteroperator.MouseLeftClickUp(mouseposX,mouseposY)
+
+    member this.OpenPopupCalibration1() = 
+        let x = MessageBox.Show("Posizionati nell'angolo in basso a destra del tuo desktop virtuale","Calibrazione", MessageBoxButtons.RetryCancel)        
+        if x = DialogResult.Cancel then this.StopCalibrationNet() 
+        ignore
+
+    member this.OpenPopupCalibration2() = 
+        let x = MessageBox.Show("Posizionati nell'angolo in basso a destra del tuo desktop virtuale","Calibrazione",MessageBoxButtons.RetryCancel)
+        if x = DialogResult.Cancel then this.StopCalibrationNet() 
+        ignore 
+
+    member this.StartCalibrationNet() = 
+        match netHandler with
+            | None   -> ()
+            | Some s -> s.StartCalibration()
+
+    member this.StopCalibrationNet() = 
+        match netHandler with
+            | None   -> ()
+            | Some s -> s.StopCalibration()
+        this.ClearCalibratingFinger()
+
+    member this.StartMovementNet() = 
+        match netHandler with
+            | None   -> ()
+            | Some s -> s.StartMovement()
+
+    member this.StopMovementNet() = 
+        match netHandler with
+            | None   -> ()
+            | Some s -> s.StopMovement()
