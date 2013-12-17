@@ -945,7 +945,6 @@ type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
             ([|dim1x ; dim1y ; dim1z|],[| dim2x ; dim2y ; dim2z |])
 
 
-
     ///<summary>
     /// fa il fitting alla retta, con la regressione lineare usando il metodo QR e restituisce 2 float
     /// L'equazione è Y = r1*X  + r0

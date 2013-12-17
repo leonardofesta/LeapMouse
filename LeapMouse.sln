@@ -9,6 +9,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GestIT", "GestIT\GestIT.fsp
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BufferedData", "BufferedData\BufferedData.fsproj", "{137107FB-34B9-4B4D-A538-2F1754493767}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "GUI\GUI.csproj", "{1ED2F01A-78A1-4846-8914-FE9326610B1C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,15 @@ Global
 		{137107FB-34B9-4B4D-A538-2F1754493767}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{137107FB-34B9-4B4D-A538-2F1754493767}.Release|Any CPU.Build.0 = Release|Any CPU
 		{137107FB-34B9-4B4D-A538-2F1754493767}.Release|x86.ActiveCfg = Release|Any CPU
+		{1ED2F01A-78A1-4846-8914-FE9326610B1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1ED2F01A-78A1-4846-8914-FE9326610B1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1ED2F01A-78A1-4846-8914-FE9326610B1C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1ED2F01A-78A1-4846-8914-FE9326610B1C}.Reading|Any CPU.ActiveCfg = Release|Any CPU
+		{1ED2F01A-78A1-4846-8914-FE9326610B1C}.Reading|Any CPU.Build.0 = Release|Any CPU
+		{1ED2F01A-78A1-4846-8914-FE9326610B1C}.Reading|x86.ActiveCfg = Release|Any CPU
+		{1ED2F01A-78A1-4846-8914-FE9326610B1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1ED2F01A-78A1-4846-8914-FE9326610B1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1ED2F01A-78A1-4846-8914-FE9326610B1C}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

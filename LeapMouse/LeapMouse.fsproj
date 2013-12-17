@@ -71,6 +71,11 @@
       <Project>{75b1878d-0959-4351-9be5-775a7b1a1021}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\GUI\GUI.csproj">
+      <Name>GUI</Name>
+      <Project>{1ed2f01a-78a1-4846-8914-fe9326610b1c}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\LeapSensor\LeapSensor.fsproj">
       <Name>LeapSensor</Name>
       <Project>{abb3e7ef-37eb-4d04-8753-23eaa9d516b3}</Project>

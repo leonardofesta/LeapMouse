@@ -5,6 +5,7 @@ module LeapMouse.Start
 open GestIT
 open GestIT.FSharp
 open GestIT.Leap
+open GUI
 open BufferData.IData
 open BufferData.Events
 open BufferData.TData
@@ -23,13 +24,14 @@ let main argv =
     let sensor = new FusionSensor<LeapFeatureTypes,System.EventArgs>()
     let app = new TrayApplication()
     let controller = new LMController(app)
+    let gui = new Form1()
     // let calibrazione = calibrazionebuilder(app,controller)
     let eventi = eventbuilder(app,controller)
     let leap = new LeapSensor()
-    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPESCREENTAP)
-    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPECIRCLE)
-    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPESWIPE)
-    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPEKEYTAP)
+//    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPESCREENTAP)
+//    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPECIRCLE)
+//    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPESWIPE)
+//    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPEKEYTAP)
     leap.Controller.SetPolicyFlags(Leap.Controller.PolicyFlag.POLICYBACKGROUNDFRAMES)
 
     let rightbuffer = new Buffered1D<_>()
@@ -40,7 +42,9 @@ let main argv =
 
     let buffz = new Buffered3D<_>()
     let evbufz = new EventBuffer<_,_,_>(buffz)
+    
 
+    // toglie il pollice che tende ad apparire a caso ogni tanto dalla lista totale delle dita
     let totalfingers:(Leap.Hand -> float) = fun t ->   let hd = t.Direction
                                                        let fingerlist = t.Fingers
                                                        let finger_list = new List<Leap.Finger>()
@@ -50,8 +54,6 @@ let main argv =
                                                        |> Seq.filter (fun x -> ((float ((x:Leap.Finger).Direction.AngleTo(hd)) * 57.3 )< 30.0 )) 
                                                        |> Seq.length 
                                                        |> float
-                                                       |> fun x -> System.Console.WriteLine("valore x " + x.ToString())
-                                                                   x
                
     let rightclickhandler:(LeapSensorEventArgs -> unit) = fun t -> let fingerlist = t.ActivityFingers
                                                                    let handlist = t.ActivityHands
@@ -75,7 +77,6 @@ let main argv =
     let StationaryEvent2 = new TEvent<_,_> (stationary (3000.0,40.0),true,"DitoStazionario2")
     let StopModifica     = new TEvent<_,_> ((fun x -> true), true, "stopmodifica")
     let MovingEvent      = new TEvent<_,_> ((fun x -> true), true, "muovendo")
-
     let RightClickDown   = new TEvent<_,_> (rightclickdown(),true,"rightclickdown")
     let RightClickUp     = new TEvent<_,_> (rightclickup()  ,true,"rightclickdown")
     let LeftClickDown    = new TEvent<_,_> (leftclickdown(300.0),true,"leftclickdown")
@@ -106,8 +107,8 @@ let main argv =
 
 
     leap.Connect() |> ignore
-    eventi.ToGestureNet(sensor) |> ignore
-    
+    let k = eventi.ToGestureNet(sensor) :> System.IDisposable
+   
     Application.Run(app)
 
     leap.Disconnect() |>ignore
