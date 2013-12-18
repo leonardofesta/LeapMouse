@@ -17,11 +17,11 @@ type Delegate = delegate of unit -> unit
      let mutable movementnet = None
 
      member this.StartCalibration() = 
-            calibrationnet <- calibration.ToNet(sensor) |> Some
-
-
+            calibrationnet <- calibration.ToInternalGestureNet(sensor) |> Some
+            calibrationnet.Value.AddTokens([|new Token()|]) 
+       
      member this.StartMovement() = 
-            movementnet <- movement.ToNet(sensor) |> Some
+            movementnet <- movement.ToGestureNet(sensor) |> Some
 
      member this.StopCalibration() = 
             match calibrationnet with 
