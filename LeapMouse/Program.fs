@@ -29,19 +29,18 @@ let main argv =
     
     let gui = new Form1()
     let controller = new LMController(gui)
-    let calibrazione = calibrazionebuilder(app,controller)
+    let calibrazione = calibrazionebuilder(controller)
     
-    let eventi = eventbuilder(app,controller)
-    
-    let netshandler = new NetHandler(calibrazione,eventi,sensor)
-    controller.setNets(netshandler)
+    let eventi = eventbuilder(gui,controller)
 
+ 
     let leap = new LeapSensor()
 //    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPESCREENTAP)
 //    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPECIRCLE)
 //    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPESWIPE)
 //    leap.Controller.EnableGesture(Leap.Gesture.GestureType.TYPEKEYTAP)
     leap.Controller.SetPolicyFlags(Leap.Controller.PolicyFlag.POLICYBACKGROUNDFRAMES)
+
 
     let rightbuffer = new Buffered1D<_>()
     let rightevbuffer = new EventBuffer<_,_,_>(rightbuffer)
@@ -51,7 +50,15 @@ let main argv =
 
     let buffz = new Buffered3D<_>()
     let evbufz = new EventBuffer<_,_,_>(buffz)
-    
+
+
+    // Linking della GUI
+    gui.CalibrationClickEvt.Add(fun t -> controller.CalibrationClick())
+    gui.StartStopClickEvt.Add(fun t -> controller.MovementClick())
+    gui.ExitClickEvt.Add(fun t -> gui.Close() 
+                                  leap.Disconnect() 
+                                  |>ignore )
+    gui.HideClickEvt.Add(fun t -> gui.WindowState <- FormWindowState.Minimized)
 
     // toglie il pollice che tende ad apparire a caso ogni tanto dalla lista totale delle dita
     let totalfingers:(Leap.Hand -> float) = fun t ->   let hd = t.Direction
@@ -116,9 +123,12 @@ let main argv =
 
 
     leap.Connect() |> ignore
-    let k = eventi.ToGestureNet(sensor) :> System.IDisposable
-   
-    Application.Run(app)
+  
+  
+    let netshandler = new NetHandler(calibrazione,eventi,sensor)
+    controller.setNets(netshandler)
+    
+    Application.Run(gui)
 
     leap.Disconnect() |>ignore
     0 // return an integer exit code

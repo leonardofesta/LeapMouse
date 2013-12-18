@@ -30,7 +30,7 @@ type TEvent<'X,'V> (triggerfun : 'V -> bool, ?active: bool, ?name:string)=
             counter <- counter + 1
             System.Diagnostics.Debug.WriteLine("buffer ->" )
             System.Diagnostics.Debug.WriteLine ( (triggerfun value).ToString())
-     *)  
+     *) 
         triggerfun value
     
     member this.IsActive():bool = 
@@ -61,7 +61,7 @@ type EventBuffer<'T,'W,'U> when 'T :> BufferedData<'W> and 'W :> Data<'U> (data:
     
         eventlist
             |>Seq.filter( fun x -> (x.IsActive() && x.CheckFun(data)))
-            |>Seq.iter(fun x ->x.Trigger(data))
+            |>Seq.iter(fun x -> x.Trigger(data))
 
 
 type EventsBuffer<'T,'W,'U> when 'T :> BufferedData<'W> and 'W :> Data<'U> ()  =

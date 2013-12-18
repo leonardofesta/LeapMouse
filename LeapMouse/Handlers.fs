@@ -9,7 +9,7 @@ open GestIT.Leap
 
 type Delegate = delegate of unit -> unit
 
-let standingTL_h (app:TrayApplication) (contr:LMController) (sender:_, f:LeapFeatureTypes, e:System.EventArgs) =  
+let standingTL_h (contr:LMController) (sender:_, f:LeapFeatureTypes, e:System.EventArgs) =  
        let ee = e:?>Buffered2D<FingerInfo> 
        let element = ee.GetListBuffer().[( ee.GetListBuffer().Length - 1 )]
 
@@ -21,7 +21,7 @@ let standingTL_h (app:TrayApplication) (contr:LMController) (sender:_, f:LeapFea
        |>ignore
        System.Console.WriteLine("angolotopleft")
 
-let standingLR_h (app:TrayApplication) (contr:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) =
+let standingLR_h (contr:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) =
        let ee = e:?>Buffered2D<FingerInfo>     
        let element = ee.GetListBuffer().[( ee.GetListBuffer().Length - 1 )]
 
@@ -33,23 +33,23 @@ let standingLR_h (app:TrayApplication) (contr:LMController) (sender:_,f:LeapFeat
        |>ignore
        System.Console.WriteLine("angolobottomright")
 
-let ditoapparso_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
+let ditoapparso_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
 //       app.Invoke(new Delegate(fun () -> app.PopText("dito trovato")))
        controller.OpenPopupCalibration1()
        |>ignore
        System.Console.WriteLine("dito trovato")
 
-let nomod_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
+let nomod_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
        controller.Modify(false)
        System.Console.WriteLine("stop modifiche per calibrazione")
 
-let setcalibratingfinger_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
+let setcalibratingfinger_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
        let ee = e:?> LeapSensorEventArgs
        controller.SetCalibratingFinger(ee.ActivityFingers.Head.Id)
        System.Console.WriteLine("stiamo settando il dito")
-       app.Invoke(new Delegate(fun () -> app.PopText("dito trovato")))
-       |>ignore
-       System.Console.WriteLine("dito trovato")
+//       app.Invoke(new Delegate(fun () -> app.PopText("dito trovato")))
+//       |>ignore
+//       System.Console.WriteLine("dito trovato")
 
 
 let moving_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 

@@ -83,10 +83,10 @@ namespace LeapMouse.GUI
         public void changeStartStopButton(int button) {
             switch (button) { 
                 case BUTTONSTART :
-                    bHide.Text = "Avvia";
+                    bStartStop.Text = "Avvia";
                     break;
                 case BUTTONSTOP :
-                    bHide.Text = "Ferma";
+                    bStartStop.Text = "Ferma";
                     break;
                 default : 
                     throw new IndexOutOfRangeException("Stringa non prevista");
