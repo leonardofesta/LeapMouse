@@ -58,7 +58,6 @@ type EventBuffer<'T,'W,'U> when 'T :> BufferedData<'W> and 'W :> Data<'U> (data:
 
     member this.AddItem(d:'W) =
         data.AddItem(d)  
-    
         eventlist
             |>Seq.filter( fun x -> (x.IsActive() && x.CheckFun(data)))
             |>Seq.iter(fun x -> x.Trigger(data))

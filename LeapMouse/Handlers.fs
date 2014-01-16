@@ -16,8 +16,6 @@ let standingTL_h (contr:LMController) (sender:_, f:LeapFeatureTypes, e:System.Ev
        ee.Clear()
        contr.setmouseTopLeft(element.D1,element.D2)
        contr.OpenPopupCalibration2()
-//       app.Invoke(new Delegate(fun () -> app.PopText("alto a sinistra ok")
-//                                         ))
        |>ignore
        System.Console.WriteLine("angolotopleft")
 
@@ -27,29 +25,23 @@ let standingLR_h (contr:LMController) (sender:_,f:LeapFeatureTypes,e:System.Even
 
        ee.Clear()
        contr.setmouseBottomRight(element.D1,element.D2)
-//       app.Invoke(new Delegate(fun () -> app.PopText("basso destra ok")
-//                                         ))
 /// TODO VEDERE SE FARE ALTRO POPUP ... 
        |>ignore
        System.Console.WriteLine("angolobottomright")
 
-let ditoapparso_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
-//       app.Invoke(new Delegate(fun () -> app.PopText("dito trovato")))
-       controller.OpenPopupCalibration1()
-       |>ignore
-       System.Console.WriteLine("dito trovato")
-
 let nomod_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
        controller.Modify(false)
+       controller.ClosePopupCalibration3()
+       controller.SetDesktopCoordinates()
        System.Console.WriteLine("stop modifiche per calibrazione")
 
 let setcalibratingfinger_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
        let ee = e:?> LeapSensorEventArgs
        controller.SetCalibratingFinger(ee.ActivityFingers.Head.Id)
        System.Console.WriteLine("stiamo settando il dito")
-//       app.Invoke(new Delegate(fun () -> app.PopText("dito trovato")))
-//       |>ignore
-//       System.Console.WriteLine("dito trovato")
+       controller.OpenPopupCalibration1()
+
+// Mouse simulating handlers net 
 
 
 let moving_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
@@ -61,6 +53,7 @@ let moving_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.Eve
 
            controller.movemouse(element.D1,element.D2)
            |>ignore
+
 
 let leftclick_h (app:TrayApplication) (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
         System.Console.WriteLine("Leftclickhandler")

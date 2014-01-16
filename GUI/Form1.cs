@@ -52,7 +52,7 @@ namespace LeapMouse.GUI
             ExitClickEvt.Invoke(sender, e);
         }
 
-        public void setDesktopMargin(float x1, float y1, float x2, float y2) {
+        public void setDesktopMargin(int x1, int y1, int x2, int y2) {
 
             string l1 = " ( " + x1 + " ; " + y1 + " ) ";
             string l2 = " ( " + x2 + " ; " + y2 + " ) ";

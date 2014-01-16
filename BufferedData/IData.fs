@@ -14,7 +14,9 @@ type Accumulator<'U,'T> when 'U :> Data<'T> =
 
 //capire se vale la pena avere questa interfaccia
 type NumericData<'U,'T> when 'U :> Data<'T> = 
-
+    
+    abstract member Last        :   'U
+                with get
     abstract member Sum         :   'U
                 with get
     abstract member Average     :   'U 
@@ -23,7 +25,8 @@ type NumericData<'U,'T> when 'U :> Data<'T> =
                 with get
     abstract member StDev       :   'U
                 with get
-
+    abstract member Count       :   int
+                with get 
 
 type Data1D<'T> = 
     inherit Data<'T>

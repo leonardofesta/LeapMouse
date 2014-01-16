@@ -28,7 +28,8 @@ let main argv =
     let app = new TrayApplication()
     
     let gui = new Form1()
-    let controller = new LMController(gui)
+    let popup = new PopupDialog()
+    let controller = new LMController(gui,popup)
     let calibrazione = calibrazionebuilder(controller)
     
     let eventi = eventbuilder(gui,controller)
@@ -55,10 +56,15 @@ let main argv =
     // Linking della GUI
     gui.CalibrationClickEvt.Add(fun t -> controller.CalibrationClick())
     gui.StartStopClickEvt.Add(fun t -> controller.MovementClick())
-    gui.ExitClickEvt.Add(fun t -> gui.Close() 
-                                  leap.Disconnect() 
-                                  |>ignore )
+    gui.ExitClickEvt.Add(fun t -> gui.Close()
+                                  leap.Disconnect()
+                                  |>ignore
+                                  )
     gui.HideClickEvt.Add(fun t -> gui.WindowState <- FormWindowState.Minimized)
+
+    popup.PopupAnnullaEvt.Add(fun t -> controller.CalibrationClick()
+                                       popup.Hide()
+                                       )
 
     // toglie il pollice che tende ad apparire a caso ogni tanto dalla lista totale delle dita
     let totalfingers:(Leap.Hand -> float) = fun t ->   let hd = t.Direction

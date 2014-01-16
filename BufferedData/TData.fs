@@ -64,7 +64,7 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
     ///<returns>un oggetto Buffereed1D</returns>    
     member this.cutBuffer(millisec:float):Buffered1D<'T> = 
             let newlist = listcut(itemlist,millisec)
-            new Buffered1D<'T>(new List<TData1D<'T>> ( newlist))
+            new Buffered1D<'T>(new List<TData1D<'T>> (newlist))
 
     ///<summary>
     ///Calcola la lunghezza del periodo reale di tempo campionato dal buffer 
@@ -330,10 +330,10 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
         Array.iter(filter) d1buff
         Transform.FourierInverse(d1buff)
         let valori = Array.map2(fun x y ->  { new TData1D<'T> with 
-                                                    member this.D1 = (x:Numerics.Complex).Real
+                                                    member this.D1   = (x:Numerics.Complex).Real
                                                     member this.Time = (y:TData1D<'T>).Time
                                                     member this.Info = (y:TData1D<'T>).Info
-                                        })  d1buff  (this.GetArrayBuffer()) 
+                                            })  d1buff  (this.GetArrayBuffer()) 
         Buffered1D(new List<TData1D<'T>>(valori))
      
     ///<summary>

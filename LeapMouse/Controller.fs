@@ -17,8 +17,7 @@ type Delegate = delegate of unit -> unit
      let mutable movementnet = None
 
      member this.StartCalibration() = 
-            calibrationnet <- calibration.ToInternalGestureNet(sensor) |> Some
-            calibrationnet.Value.AddTokens([|new Token()|]) 
+            calibrationnet <- calibration.ToGestureNet(sensor) |> Some
        
      member this.StartMovement() = 
             movementnet <- movement.ToGestureNet(sensor) |> Some
@@ -38,7 +37,7 @@ type Delegate = delegate of unit -> unit
 
 extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
 
-type LMController(app:Form1) = 
+type LMController(app:Form1,popup:PopupDialog) = 
     let mutable fingerid = -1
     let mutable left   = -400.0
     let mutable top    = 800.0
@@ -64,6 +63,10 @@ type LMController(app:Form1) =
 
     let mutable netHandler = None
 
+    let popupthread  =  new System.Threading.Thread(fun () -> popup.setText("Positizonati nell'angolo in alto a sinistra del tuo desktop virtuale e attendi 4 secondi")
+                                                              Application.Run(popup))
+
+        
     member this.setNets(nets:NetHandler) = 
         netHandler <- nets |> Some 
     
@@ -146,14 +149,33 @@ type LMController(app:Form1) =
 
 // Popup durante la calibrazione
     member this.OpenPopupCalibration1() = 
-        let x = MessageBox.Show("Posizionati nell'angolo in basso a destra del tuo desktop virtuale","Calibrazione", MessageBoxButtons.RetryCancel)        
-        if x = DialogResult.Cancel then this.StopCalibrationNet() 
-        ignore
+        if not(popupthread.IsAlive) then popupthread.Start()
+                                    else popup.Invoke(new Delegate(fun () -> popup.setText("Positizonati nell'angolo in alto a sinistra del tuo desktop virtuale e attendi 4 secondi")
+                                                                             popup.setButtonText("Annulla")
+                                                                             popup.Show())) |>ignore
+                                             
+        |>ignore
 
     member this.OpenPopupCalibration2() = 
-        let x = MessageBox.Show("Posizionati nell'angolo in basso a destra del tuo desktop virtuale","Calibrazione",MessageBoxButtons.RetryCancel)
-        if x = DialogResult.Cancel then this.StopCalibrationNet() 
-        ignore 
+        popup.Invoke(new Delegate(fun () -> popup.Hide()))
+        |> ignore
+        System.Threading.Thread.Sleep(200)
+        popup.Invoke(new Delegate( fun () -> popup.setText("Positizonati nell'angolo in basso a destra del tuo desktop virtuale e attendi 4 secondi")
+                                             popup.Show()))
+        |>ignore
+        
+    member this.ClosePopupCalibration3() = 
+        popup.Invoke(new Delegate(fun () -> popup.setText("Settaggio Completato")
+                                            popup.setButtonText("Continua")
+                                            //popup.Hide()
+                                            ))
+        |>ignore
+
+    member this.SetDesktopCoordinates() = 
+        app.Invoke(new Delegate (fun () -> app.setDesktopMargin(int left, int top,
+                                                                int right, int bottom)))
+        |>ignore
+
 
 
 /// Parte per i tasti della gui, fa partire e ferma le reti 
@@ -187,7 +209,8 @@ type LMController(app:Form1) =
 
     member this.CalibrationClick() = 
         if calibrating then this.StopCalibrationNet()
-                       else this.StartCalibrationNet()
+                       else this.Modify(true)
+                            this.StartCalibrationNet()
 
     member this.MovementClick() = 
         if moving then this.StopMovementNet()
