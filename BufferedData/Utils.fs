@@ -118,3 +118,16 @@ let continuity(mylist:list<'T> when 'T :> TData<_>, interval:float):bool =
                    let timediff = List.map2 (fun x y -> ((x:>TData<_>).Time.Subtract((y:>TData<_>).Time)).TotalMilliseconds
                                                         ) mylist secondlist
                    List.forall(fun x -> x<interval) timediff
+
+let ispresent(item:'T, lista:list<'T> when 'T :> TData<_>):bool =
+            if (lista.Length < 1) 
+                then 
+                    false
+                else
+                    if (((List.filter(fun (t:'T) -> item.Time.Equals(t.Time))) lista  ).Length = 0 ) 
+                        then 
+                            false
+                        else 
+                            true
+
+                   

@@ -187,6 +187,47 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
 
 
 
+    
+    ///<summary>
+    ///Calcola la accelerazione ottenuta comparando la velocità ottenuta nella parte tra start e mid con quella da mid al momento attuale
+    ///</summary>
+    ///<param name="start">rappresenta il punto di inizio della area presa in considerazione come momento precedente, da considerare fino al mid </param>
+    ///<param name="mid"> rappresenta il punto da cui in poi verrà preso in considerazione come momento attuale fino al momento attuale </param>
+    ///<returns>float rappresentante la posizione media</returns>    
+    member this.Acceleration(start:float, mid:float):float = 
+             let mutable datafirst = listcut(itemlist,start)
+             let dataend = listcut(itemlist,mid)
+             let seconddistance = this.TotalDistance(mid)
+             let firstdistance = this.TotalDistance(start) - seconddistance
+             
+             datafirst  <- List.filter(fun t -> ispresent(t,dataend)) datafirst
+             if (dataend.Length < 1 ) 
+                then  0.0
+                else
+                    let startingtime = dataend.Head.Time
+                    let lasttime = (dataend.Item(dataend.Length - 1)).Time
+                    let secondtime = ((lasttime - startingtime).TotalMilliseconds)*1000.0
+                    let secondvelocity = seconddistance / secondtime
+
+                    if (datafirst.Length <1) 
+                        then
+                            secondvelocity/ secondtime
+                        else
+                            let firststartingtime =  datafirst.Head.Time
+                            let firstlasttime = (datafirst.Item(datafirst.Length - 1 )).Time
+                            let firsttime = ((firstlasttime - firststartingtime).TotalMilliseconds)*1000.0 
+                            let firstvelocity = firstdistance / firsttime
+
+                            (secondvelocity - firstvelocity) / (secondtime - firsttime)
+
+    ///<summary>
+    ///Calcola la velocità istantanea degli ultimi eventi negli ultimi 100ms
+    ///</summary>
+    ///<returns>la velocità istantanea oppure 0 se non ci sono 2 elementi necessari</returns>
+    member this.InstantAcceleration():float=
+            this.Acceleration(200.0,100.0)
+           
+
     ///<summary>
     ///Calcola la posizione media del punto dato un timespan e ritorna il valore
     ///</summary>
@@ -526,6 +567,45 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
                 else
                     0.0 // TODO : Decidere cosa fare x quando non ho dettagli
 
+ 
+    ///<summary>
+    ///Calcola la accelerazione ottenuta comparando la velocità ottenuta nella parte tra start e mid con quella da mid al momento attuale
+    ///</summary>
+    ///<param name="start">rappresenta il punto di inizio della area presa in considerazione come momento precedente, da considerare fino al mid </param>
+    ///<param name="mid"> rappresenta il punto da cui in poi verrà preso in considerazione come momento attuale fino al momento attuale </param>
+    ///<returns>float rappresentante la posizione media</returns>    
+    member this.Acceleration(start:float, mid:float):float = 
+             let mutable datafirst = listcut(itemlist,start)
+             let dataend = listcut(itemlist,mid)
+             let seconddistance = this.TotalDistance(mid)
+             let firstdistance = this.TotalDistance(start) - seconddistance
+             
+             datafirst  <- List.filter(fun t -> ispresent(t,dataend)) datafirst
+             if (dataend.Length < 1 ) 
+                then  0.0
+                else
+                    let startingtime = dataend.Head.Time
+                    let lasttime = (dataend.Item(dataend.Length - 1)).Time
+                    let secondtime = ((lasttime - startingtime).TotalMilliseconds)*1000.0
+                    let secondvelocity = seconddistance / secondtime
+
+                    if (datafirst.Length <1) 
+                        then
+                            secondvelocity/ secondtime
+                        else
+                            let firststartingtime =  datafirst.Head.Time
+                            let firstlasttime = (datafirst.Item(datafirst.Length - 1 )).Time
+                            let firsttime = ((firstlasttime - firststartingtime).TotalMilliseconds)*1000.0 
+                            let firstvelocity = firstdistance / firsttime
+
+                            (secondvelocity - firstvelocity) / (secondtime - firsttime)
+
+    ///<summary>
+    ///Calcola la velocità istantanea degli ultimi eventi negli ultimi 100ms
+    ///</summary>
+    ///<returns>la velocità istantanea oppure 0 se non ci sono 2 elementi necessari</returns>
+    member this.InstantAcceleration():float=
+            this.Acceleration(200.0,100.0)
 
     ///<summary>
     ///Calcola la posizione media del punto dato un timespan e ritorna il valore
@@ -870,6 +950,47 @@ type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
                     velocity   
                 else
                     0.0 // TODO : Decidere cosa fare x quando non ho dettagli
+
+ 
+    ///<summary>
+    ///Calcola la accelerazione ottenuta comparando la velocità ottenuta nella parte tra start e mid con quella da mid al momento attuale
+    ///</summary>
+    ///<param name="start">rappresenta il punto di inizio della area presa in considerazione come momento precedente, da considerare fino al mid </param>
+    ///<param name="mid"> rappresenta il punto da cui in poi verrà preso in considerazione come momento attuale fino al momento attuale </param>
+    ///<returns>float rappresentante la posizione media</returns>    
+    member this.Acceleration(start:float, mid:float):float = 
+             let mutable datafirst = listcut(itemlist,start)
+             let dataend = listcut(itemlist,mid)
+             let seconddistance = this.TotalDistance(mid)
+             let firstdistance = this.TotalDistance(start) - seconddistance
+             
+             datafirst  <- List.filter(fun t -> ispresent(t,dataend)) datafirst
+             if (dataend.Length < 1 ) 
+                then  0.0
+                else
+                    let startingtime = dataend.Head.Time
+                    let lasttime = (dataend.Item(dataend.Length - 1)).Time
+                    let secondtime = ((lasttime - startingtime).TotalMilliseconds)*1000.0
+                    let secondvelocity = seconddistance / secondtime
+
+                    if (datafirst.Length <1) 
+                        then
+                            secondvelocity/ secondtime
+                        else
+                            let firststartingtime =  datafirst.Head.Time
+                            let firstlasttime = (datafirst.Item(datafirst.Length - 1 )).Time
+                            let firsttime = ((firstlasttime - firststartingtime).TotalMilliseconds)*1000.0 
+                            let firstvelocity = firstdistance / firsttime
+
+                            (secondvelocity - firstvelocity) / (secondtime - firsttime)
+
+   ///<summary>
+    ///Calcola la velocità istantanea degli ultimi eventi negli ultimi 100ms
+    ///</summary>
+    ///<returns>la velocità istantanea oppure 0 se non ci sono 2 elementi necessari</returns>
+    member this.InstantAcceleration():float=
+            this.Acceleration(200.0,100.0)
+
 
     ///<summary>
     ///Calcola la posizione media del punto dato un timespan e ritorna il valore
