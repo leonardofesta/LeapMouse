@@ -54,11 +54,15 @@ namespace LeapMouse.GUI
 
         public void setDesktopMargin(int x1, int y1, int x2, int y2) {
 
-            string l1 = " ( " + x1 + " ; " + y1 + " ) ";
-            string l2 = " ( " + x2 + " ; " + y2 + " ) ";
-
-            this.lTopLeft.Text = l1;
-            this.lBottomRight.Text = l2;
+            string top = "" + x1;
+            string left = "" + y1;
+            string bottom = "" + x2;
+            string right = "" + y2;
+  
+            this.lLeft.Text = left;
+            this.lRight.Text = right;
+            this.lTop.Text = top;
+            this.lBottom.Text = bottom;
             
         }
 

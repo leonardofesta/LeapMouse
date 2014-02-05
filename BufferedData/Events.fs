@@ -63,11 +63,11 @@ type EventBuffer<'T,'W,'U> when 'T :> BufferedData<'W> and 'W :> Data<'U> (data:
             |>Seq.iter(fun x -> x.Trigger(data))
 
 
-type EventsBuffer<'T,'W,'U> when 'T :> BufferedData<'W> and 'W :> Data<'U> ()  =
+type EventsBuffer<'T,'W,'U> when 'T :> BufferedData<'W> and 'W :> Data<'U> (resultargFun:Dictionary<int,'T> -> 'Z when 'Z:>System.EventArgs)  =
 
     let eventlist = new List<TEvent<_,_>>()
     let datalist = new Dictionary<int,'T>()
- 
+    
     member this.AddDataBuffer(id:int, buff:'T) = 
                     if (datalist.ContainsKey(id)) then 
                                                        raise (DataBufferIDExists("ID Già esistente")) 
@@ -95,4 +95,5 @@ type EventsBuffer<'T,'W,'U> when 'T :> BufferedData<'W> and 'W :> Data<'U> ()  =
     member private this.checkevents() = 
         eventlist
             |>Seq.filter(fun x-> (x.IsActive() && x.CheckFun(datalist)))
-            |>Seq.iter(fun x-> x.Trigger(datalist))
+            |>Seq.iter(fun x-> x.Trigger(resultargFun datalist))
+        

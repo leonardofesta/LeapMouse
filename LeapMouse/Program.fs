@@ -19,9 +19,6 @@ open LeapMouse.EvtFunction
 open LeapMouse.Controller
 
     
-
-
-
 [<EntryPoint>]
 let main argv = 
     let sensor = new FusionSensor<LeapFeatureTypes,System.EventArgs>()

@@ -218,7 +218,7 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
                             let firsttime = ((firstlasttime - firststartingtime).TotalMilliseconds)*1000.0 
                             let firstvelocity = firstdistance / firsttime
 
-                            (secondvelocity - firstvelocity) / (secondtime - firsttime)
+                            (secondvelocity - firstvelocity) / (secondtime)
 
     ///<summary>
     ///Calcola la velocità istantanea degli ultimi eventi negli ultimi 100ms
@@ -335,7 +335,7 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
     ///<param name=funzione> funzione che verifica la proprietà richiesta, restituendo un bool
     ///<return> Ritorna un float con una percentuale (0.qualcosa) che rappresenta quante iterazioni sono ok</return>
     ///</summary>
-    member this.FollowingFunction(theoricfun:(float -> TimespanData), checkingfun:((TimespanData*TimespanData) -> Boolean) , timespan:float) =    ///TODO : dare titolo
+    member this.FollowingFunction(theoricfun:(float -> TimespanData), checkingfun:((TimespanData*TimespanData) -> Boolean) , timespan:float):float =    ///TODO : dare titolo
  
         let listatagliata = listcut (itemlist,timespan)
         let primo = listatagliata.Head.Time
@@ -598,7 +598,7 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
                             let firsttime = ((firstlasttime - firststartingtime).TotalMilliseconds)*1000.0 
                             let firstvelocity = firstdistance / firsttime
 
-                            (secondvelocity - firstvelocity) / (secondtime - firsttime)
+                            (secondvelocity - firstvelocity) / (secondtime)
 
     ///<summary>
     ///Calcola la velocità istantanea degli ultimi eventi negli ultimi 100ms
@@ -982,7 +982,7 @@ type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
                             let firsttime = ((firstlasttime - firststartingtime).TotalMilliseconds)*1000.0 
                             let firstvelocity = firstdistance / firsttime
 
-                            (secondvelocity - firstvelocity) / (secondtime - firsttime)
+                            (secondvelocity - firstvelocity) / (secondtime)
 
    ///<summary>
     ///Calcola la velocità istantanea degli ultimi eventi negli ultimi 100ms

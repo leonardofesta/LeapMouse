@@ -33,12 +33,12 @@ let eventbuilder( app:_,cont:LMController) =
 
 let calibrazionebuilder(cont:LMController) = 
 
-    let nuovodito  = new GroundTerm<_,_>(LeapFeatureTypes.NewFinger,fun _ -> System.Console.WriteLine("calibrazione boh " + cont.AlreadyCalibrating().ToString())
-                                                                             not (cont.AlreadyCalibrating()))
-    let fermo      = new GroundTerm<_,_>(LeapFeatureTypes.Stabile)
-    let fermo2     = new GroundTerm<_,_>(LeapFeatureTypes.Stabile2)
-    let stopmodify = new GroundTerm<_,_>(LeapFeatureTypes.Calibrato)
+    let newfinger   = new GroundTerm<_,_>(LeapFeatureTypes.NewFinger,fun _ -> System.Console.WriteLine("calibrazione boh " + cont.AlreadyCalibrating().ToString())
+                                                                              not (cont.AlreadyCalibrating()))
+    let stable1     = new GroundTerm<_,_>(LeapFeatureTypes.Stabile)
+    let stable2     = new GroundTerm<_,_>(LeapFeatureTypes.Stabile2)
+    let calibrationend  = new GroundTerm<_,_>(LeapFeatureTypes.Calibrato)
 
-    let calibrating = ((nuovodito |-> setcalibratingfinger_h cont) |>> (fermo |-> standingTL_h  cont ) |>> (fermo2 |-> standingLR_h  cont ) |>> (stopmodify |-> nomod_h  cont))
+    let calibrating = ((newfinger |-> setcalibratingfinger_h cont) |>> (stable1 |-> standingTL_h  cont ) |>> (stable2 |-> standingLR_h  cont ) |>> (calibrationend |-> nomod_h  cont))
     
     calibrating

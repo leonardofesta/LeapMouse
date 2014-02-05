@@ -29,15 +29,17 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.bExit = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.lBottomRight = new System.Windows.Forms.Label();
-            this.lTopLeft = new System.Windows.Forms.Label();
+            this.lRight = new System.Windows.Forms.Label();
+            this.lLeft = new System.Windows.Forms.Label();
             this.bHide = new System.Windows.Forms.Button();
             this.bStartStop = new System.Windows.Forms.Button();
             this.bCalibrate = new System.Windows.Forms.Button();
             this.LStatus = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.bExit = new System.Windows.Forms.Button();
+            this.lTop = new System.Windows.Forms.Label();
+            this.lBottom = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -58,35 +60,47 @@
             this.panel1.Size = new System.Drawing.Size(283, 261);
             this.panel1.TabIndex = 0;
             // 
+            // bExit
+            // 
+            this.bExit.Location = new System.Drawing.Point(145, 217);
+            this.bExit.Name = "bExit";
+            this.bExit.Size = new System.Drawing.Size(127, 30);
+            this.bExit.TabIndex = 6;
+            this.bExit.Text = "Esci";
+            this.bExit.UseVisualStyleBackColor = true;
+            this.bExit.Click += new System.EventHandler(this.bExit_Click);
+            // 
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.LightBlue;
-            this.panel2.Controls.Add(this.lBottomRight);
-            this.panel2.Controls.Add(this.lTopLeft);
+            this.panel2.Controls.Add(this.lBottom);
+            this.panel2.Controls.Add(this.lTop);
+            this.panel2.Controls.Add(this.lRight);
+            this.panel2.Controls.Add(this.lLeft);
             this.panel2.Location = new System.Drawing.Point(11, 59);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(261, 116);
             this.panel2.TabIndex = 5;
             // 
-            // lBottomRight
+            // lRight
             // 
-            this.lBottomRight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.lBottomRight.AutoSize = true;
-            this.lBottomRight.Location = new System.Drawing.Point(200, 91);
-            this.lBottomRight.Name = "lBottomRight";
-            this.lBottomRight.Size = new System.Drawing.Size(58, 13);
-            this.lBottomRight.TabIndex = 1;
-            this.lBottomRight.Text = "( 400 ; 25 )";
-            this.lBottomRight.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+            this.lRight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.lRight.AutoSize = true;
+            this.lRight.Location = new System.Drawing.Point(233, 52);
+            this.lRight.Name = "lRight";
+            this.lRight.Size = new System.Drawing.Size(25, 13);
+            this.lRight.TabIndex = 1;
+            this.lRight.Text = "400";
+            this.lRight.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
-            // lTopLeft
+            // lLeft
             // 
-            this.lTopLeft.AutoSize = true;
-            this.lTopLeft.Location = new System.Drawing.Point(3, 15);
-            this.lTopLeft.Name = "lTopLeft";
-            this.lTopLeft.Size = new System.Drawing.Size(67, 13);
-            this.lTopLeft.TabIndex = 0;
-            this.lTopLeft.Text = "( -400 ; 800 )";
+            this.lLeft.AutoSize = true;
+            this.lLeft.Location = new System.Drawing.Point(3, 52);
+            this.lLeft.Name = "lLeft";
+            this.lLeft.Size = new System.Drawing.Size(31, 13);
+            this.lLeft.TabIndex = 0;
+            this.lLeft.Text = "-400 ";
             // 
             // bHide
             // 
@@ -139,15 +153,25 @@
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
-            // bExit
+            // lTop
             // 
-            this.bExit.Location = new System.Drawing.Point(145, 217);
-            this.bExit.Name = "bExit";
-            this.bExit.Size = new System.Drawing.Size(127, 30);
-            this.bExit.TabIndex = 6;
-            this.bExit.Text = "Esci";
-            this.bExit.UseVisualStyleBackColor = true;
-            this.bExit.Click += new System.EventHandler(this.bExit_Click);
+            this.lTop.AutoSize = true;
+            this.lTop.Location = new System.Drawing.Point(115, 9);
+            this.lTop.Name = "lTop";
+            this.lTop.Size = new System.Drawing.Size(25, 13);
+            this.lTop.TabIndex = 2;
+            this.lTop.Text = "800";
+            // 
+            // lBottom
+            // 
+            this.lBottom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.lBottom.AutoSize = true;
+            this.lBottom.Location = new System.Drawing.Point(115, 91);
+            this.lBottom.Name = "lBottom";
+            this.lBottom.Size = new System.Drawing.Size(19, 13);
+            this.lBottom.TabIndex = 3;
+            this.lBottom.Text = "25";
+            this.lBottom.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
             // Form1
             // 
@@ -175,9 +199,11 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button bHide;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Label lBottomRight;
-        private System.Windows.Forms.Label lTopLeft;
+        private System.Windows.Forms.Label lRight;
+        private System.Windows.Forms.Label lLeft;
         private System.Windows.Forms.Button bExit;
+        private System.Windows.Forms.Label lBottom;
+        private System.Windows.Forms.Label lTop;
 
     }
 }
