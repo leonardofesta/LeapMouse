@@ -1,6 +1,5 @@
 ﻿module LeapMouse.Controller
 
-open LeapMouse.FrameApplication
 open System.Windows.Forms
 open System
 open LeapMouse.MouseInteroperator
@@ -11,6 +10,10 @@ open LeapMouse.GUI
 
 type Delegate = delegate of unit -> unit
 
+ ///<summary>
+ /// Classe di supporto per instanziare le due reti più semplicemente, 
+ /// avendo la possibilità di attivarle e spegnere chiamando un semplice metodo
+ ///</summary>
  type NetHandler(calibration:GestureExpr<LeapFeatureTypes,_>, movement:GestureExpr<LeapFeatureTypes,_>, sensor:FusionSensor<LeapFeatureTypes,_>) = 
        
      let mutable calibrationnet = None
@@ -37,6 +40,11 @@ type Delegate = delegate of unit -> unit
 
 extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
 
+
+
+///<summary>
+/// Classe che gestisce si occupa delle chiamate all'interfaccia grafica e fa da controller di tutte le componenti 
+///</summary>
 type LMController(app:Form1,popup:PopupDialog) = 
     let mutable fingerid = -1
     let mutable left   = -400.0
@@ -66,16 +74,25 @@ type LMController(app:Form1,popup:PopupDialog) =
     let popupthread  =  new System.Threading.Thread(fun () -> popup.setText("Positizonati nell'angolo in alto a sinistra del tuo desktop virtuale e attendi 4 secondi")
                                                               Application.Run(popup))
 
-        
+    
+    ///<summary>
+    /// Aggiunge l'handler delle reti al sistema
+    ///</summary>
     member this.setNets(nets:NetHandler) = 
         netHandler <- nets |> Some 
-    
+
+    ///<summary>
+    ///Setta i valori dell'angolo in alto a sinistra  
+    ///</summary>
     member this.setmouseTopLeft(xvar:float,yvar:float) = 
         if (modifyTL) then
             left<- xvar
             top <- yvar
             modifyTL <- false
-    
+
+    ///<summary>
+    ///Setta i valori dell'angolo in basso a destra
+    ///</summary>
     member this.setmouseBottomRight(xvar:float,yvar:float) = 
             if (modifyBR) then
                 right  <- xvar
@@ -84,18 +101,26 @@ type LMController(app:Form1,popup:PopupDialog) =
                 LeapW <- Math.Abs(top - bottom)
                 modifyBR<- false
     
+    ///<summary>
+    ///Setta la modificabilità del "dito usato nella procedura di calibrazione
+    ///Gestit continua ad attivare le reti, ed è necessario impedire questo in modo di far partire più procedure in contemporanea
+    ///</summary>
     member this.Modify(b:bool) = 
         modifyTL <- b
         modifyBR <- b
 
+    ///<summary>
+    ///invoca il movimento del mouse
+    ///</summary>
     member this.movemouse(xvar:float,yvar:float) = 
         // fai il movimento del mouse facendo il rapporto e spostandolo
         let mouseX,mouseY = this.mouseposition(xvar,yvar)
-  //      System.Console.WriteLine(" coordinate Leap x " + xvar.ToString() + " y  " + yvar.ToString()  )
-  //      System.Console.WriteLine(" coordinate desktop x = "   + mouseX.ToString() + "   y =  " + mouseY.ToString())
         app.Invoke(new Delegate(fun () -> System.Windows.Forms.Cursor.Position <- new System.Drawing.Point( mouseX , mouseY )))   
         |>ignore
 
+    ///<summary>    
+    /// metodo privato che provvede a fare la giusta proporzione tra il desktop e lo spazio del leap 
+    ///</summary>
     member private this.mouseposition(leapX:float,leapY:float) =
         let propX = (leapX - left)/LeapW  
         let propY = (top - leapY)/LeapH
@@ -105,22 +130,26 @@ type LMController(app:Form1,popup:PopupDialog) =
         mouseposY <- int64 fmouseY 
         (int fmouseX),(int fmouseY)
 
+    
+    ///<summary>
+    /// setta l'id del dito che sarà usato per la fase di calibrazione
+    ///</summary>
     member this.SetCalibratingFinger(id:int) = 
         if (fingerid = -1 ) then fingerid <- id
         System.Console.WriteLine("dito settato a " + fingerid.ToString())
 
+    ///<summary>
+    /// risetta a -1 l'id del dito, che rappresenta nessun dito settato
+    ///</summary>
     member this.ClearCalibratingFinger() =
         fingerid <- -1
 
+    ///<summary>
+    /// controlla se c'è già una rete in calibrazione
+    ///</summary>
     member this.AlreadyCalibrating() =
         if (fingerid = -1) then false
                            else true
-
-    member this.LeftClickmouse() = 
-        if (System.DateTime.Now.Subtract(lastclick).TotalMilliseconds > 400.0)
-            then
-            lastclick <- System.DateTime.Now.AddMilliseconds(0.0)
-            MouseInteroperator.MouseLeftClick(mouseposX,mouseposY)
 
     member this.RightClickDown() =
         if not(rightcliked)
@@ -146,8 +175,9 @@ type LMController(app:Form1,popup:PopupDialog) =
                 leftclicked <- false
                 MouseInteroperator.MouseLeftClickUp(mouseposX,mouseposY)
 
-
-// Popup durante la calibrazione
+    ///<summary>
+    /// Chiama il delegate che apre il primo popup durante la calibrazione
+    ///</summary>
     member this.OpenPopupCalibration1() = 
         if not(popupthread.IsAlive) then popupthread.Start()
                                     else popup.Invoke(new Delegate(fun () -> popup.setText("Positizonati nell'angolo in alto a sinistra del tuo desktop virtuale e attendi 4 secondi")
@@ -156,6 +186,9 @@ type LMController(app:Form1,popup:PopupDialog) =
                                              
         |>ignore
 
+    ///<summary>
+    /// Chiama il delegate che apre il secondo popup durante la calibrazione
+    ///</summary>
     member this.OpenPopupCalibration2() = 
         popup.Invoke(new Delegate(fun () -> popup.Hide()))
         |> ignore
@@ -163,7 +196,10 @@ type LMController(app:Form1,popup:PopupDialog) =
         popup.Invoke(new Delegate( fun () -> popup.setText("Positizonati nell'angolo in basso a destra del tuo desktop virtuale e attendi 4 secondi")
                                              popup.Show()))
         |>ignore
-        
+
+    ///<summary>
+    /// Chiama il delegate che apre il primo popup che conferma la avvenuta calibrazione
+    ///</summary>
     member this.ClosePopupCalibration3() = 
         popup.Invoke(new Delegate(fun () -> popup.setText("Settaggio Completato")
                                             popup.setButtonText("Continua")
@@ -171,6 +207,9 @@ type LMController(app:Form1,popup:PopupDialog) =
                                             ))
         |>ignore
 
+    ///<summary>
+    /// Aggiorna i margini del desktop virtuale di Leap
+    ///</summary>
     member this.SetDesktopCoordinates() = 
         app.Invoke(new Delegate (fun () -> app.setDesktopMargin(int left, int top,
                                                                 int right, int bottom)))
@@ -178,8 +217,7 @@ type LMController(app:Form1,popup:PopupDialog) =
 
 
 
-/// Parte per i tasti della gui, fa partire e ferma le reti 
-/// TODO vedi se il metodod modify è ancora necessario o fuffa
+    /// Sezione dei tasti della gui, fa partire e ferma le reti 
     member this.StartCalibrationNet() = 
         match netHandler with
             | None   -> ()

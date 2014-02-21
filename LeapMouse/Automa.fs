@@ -6,6 +6,7 @@ open LeapMouse.Data
 open LeapMouse.Handlers
 open LeapMouse.Controller
 
+// costruisce la rete di petri che rappresenta il movimento del mouse
 let eventbuilder(cont:LMController) = 
     
     let moving     = new GroundTerm<_,_>(LeapFeatureTypes.Moving)
@@ -22,6 +23,7 @@ let eventbuilder(cont:LMController) =
 
     events
 
+// costruisce la rete di petri che rappresenta la fase di calibrazione
 let calibrazionebuilder(cont:LMController) = 
 
     let newfinger   = new GroundTerm<_,_>(LeapFeatureTypes.NewFinger, fun _ -> not (cont.AlreadyCalibrating()))

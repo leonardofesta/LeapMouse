@@ -1,5 +1,8 @@
 ﻿module LeapMouse.Data
 
+
+/// Modulo con le interfacce per i Dati istanziati
+ 
 open BufferData.IData
 
     [<AllowNullLiteralAttribute>]
@@ -47,20 +50,14 @@ open BufferData.IData
                   member  x.Info = info
 
     type LeapFeatureTypes =
-                | Stabile = 0
-                | NewHand = 1
+                | Stabile = 1
                 | NewFinger = 2
                 | Moving = 3
-                | CalibrationFinger = 4
-                | Stabile2 = 5
-                | Calibrato = 6
-                | LClick = 7
-                | Rotate = 8
-                | ZoomOut = 9
-                | ZoomIn = 10
-                | RClickDown = 11
-                | RClickUp = 12
-                | LClickDown = 13
-                | LClickUp = 14
+                | Stabile2 = 4
+                | Calibrato = 5
+                | RClickDown = 6
+                | RClickUp = 7
+                | LClickDown = 8
+                | LClickUp = 9
  
 

@@ -3,40 +3,30 @@
 open BufferData.TData
 open BufferData.IData
 open BufferData.Data
-
 open System
+
+///<summary>
+/// funzione che verifica la stazionarietà di un punto rispetto ad una certa tolleranza
+///</summary>
 let stationary(timespan,toll) = fun buffer ->  let bb = (buffer:Buffered2D<_>)
                                                bb.StationaryPosition(timespan,toll) && bb.PeriodLength() > timespan
 
-let similarPosition(x:TData3D<_>,y:TData3D<_>) = if (((x.D1 - y.D1) <10.0) && ((x.D2 - y.D2) <10.0) && ((x.D3 - y.D3) < 10.0)) then true else false
 
-
-let clickevt(timespan) = fun buffer -> let bb = (buffer:Buffered3D<_>)
-                                       let dati = (bb.cutBuffer(timespan)).GetArrayBuffer()
-                                       let x = bb.DifferenceVector(timespan)
-                                       let x1,y1,z1 = x.AveragePosition(timespan)
-                                       let xdist,ydist,zdist = bb.ComponentDistance(timespan)
-                                       
-                                       let simpos = similarPosition(dati.[0], dati.[dati.Length-1])
-                                       if (simpos && x1 <3.0 && y1 <3.0 && zdist>50.0 && 
-                                           bb.PeriodLength()> timespan && bb.IsContinuous(timespan,40.0) ) 
-                                                then 
-                                                    true
-                                                else 
-                                                    false
-
+///<summary>
+/// Funzione che rappresenta il leftclick down, il parametro temporale è servito per calibrarla 
+///</summary>
 let leftclickdown(timespan) = fun buffer ->    let bb = (buffer:Buffered3D<_>)
                                                if (bb.Count() <2) 
                                                 then false 
                                                 else
-                                                   let dati = (bb.cutBuffer(timespan))
-                                                   let x = bb.DifferenceVector(timespan)
+                                                   let dati = (bb.cutBuffer(timespan)) // in dati finisce l'ultimo periodo di tempo
+                                                   let x = bb.DifferenceVector(timespan) //il vettore calcola le differenze dei valori
                                                    let last = bb.GetListBuffer() 
-                                                              |> fun x -> (x.Item ( x.Length - 1))
-                                                   let x1,y1,z1 = x.AveragePosition(timespan)
-                                                   let _,grad = dati.FittingToLine(timespan)
-                                                   let _,_,zdist = bb.ComponentDistance(timespan)
-                                                   let zunder0 =  List.forall ( fun x -> (x:>TData3D<_>).D3 < 0.0) (dati.GetListBuffer())
+                                                              |> fun x -> (x.Item ( x.Length - 1))  // prende l'ultimo della lista
+                                                   let x1,y1,z1 = x.AveragePosition(timespan)  
+                                                   let _,grad = dati.FittingToLine(timespan)  // prendiamo il coefficiente angolare della retta interpolata
+                                                   let _,_,zdist = bb.ComponentDistance(timespan)  //distanza percorsa nell'asse X
+                                                   let zunder0 =  List.forall ( fun x -> (x:>TData3D<_>).D3 < 0.0) (dati.GetListBuffer())  // controlla che abbiamo superato il valore soglia che è lo 0 su Z
                                                
                                                    if (zdist>50.0 && grad.[2] < -300.0 && zunder0 && x1+y1<Math.Abs(z1-10.0) &&
                                                        bb.PeriodLength()> timespan && bb.IsContinuous(timespan,100.0)) 

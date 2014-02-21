@@ -2,6 +2,7 @@
 
 open System.Runtime.InteropServices
 
+/// File di supporto per gestione eventi nativi del mouse
 
 [<DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)>]
 extern void mouse_event(System.Int64, System.Int64, System.Int64, System.Int64, System.Int64)
