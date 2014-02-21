@@ -12,10 +12,11 @@ type Accumulator<'U,'T> when 'U :> Data<'T> =
 
     abstract member Restart :   unit -> unit
 
-//capire se vale la pena avere questa interfaccia
 type NumericData<'U,'T> when 'U :> Data<'T> = 
     
     abstract member Last        :   'U
+                with get
+    abstract member SecondLast  :   'U
                 with get
     abstract member Sum         :   'U
                 with get

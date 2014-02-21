@@ -10,6 +10,10 @@ open MathNet.Numerics.Distributions
 open MathNet.Numerics.IntegralTransforms
 open MathNet.Numerics.IntegralTransforms.Algorithms
 
+
+/// <summary>
+/// Tipo di supporto per calcolare sui dati, serve a ottenere una rappresentazione temporale in float per i confronti
+/// </summary>
 type TimespanData(timespan:float,x:float,?y:float,?z:float) = 
 
            member this.D1:float = x
@@ -109,10 +113,7 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
     member this.TotalDistance(timespan:float) = 
             
             let mutable datacp = listcut(itemlist, timespan)
-            
-    //        Console.WriteLine("lunghezza itemlist -> " + (Seq.length itemlist).ToString())
-    //        Console.WriteLine("lunghezza datacp -> " + (Seq.length datacp).ToString())    
-              
+               
             if (Seq.length datacp >2)
                 then
                     let mutable current = datacp.Head
@@ -169,10 +170,7 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
     member this.AverageVelocity(timespan:float) = 
             
             let mutable datacp = listcut(itemlist, timespan)
-            
-    //        Console.WriteLine("lunghezza itemlist -> " + (Seq.length itemlist).ToString())
-    //        Console.WriteLine("lunghezza datacp -> " + (Seq.length datacp).ToString())
-            
+ 
             if (Seq.length datacp >2)
                 then
                     let startingtime = datacp.Head.Time
@@ -182,8 +180,7 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
                     let velocity = (distance / (lasttime - startingtime).TotalMilliseconds)*1000.0
                     velocity   
                 else
-                    0.0 // TODO : Decidere cosa fare x quando non ho dettagli
-
+                    0.0
 
 
 
@@ -317,11 +314,11 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
             arrayTimed
             |> Seq.map(fun f -> disteuclidea(coeff,vnoto,f.D1,f.Time))
             |> Seq.sum 
-        System.Console.WriteLine("Distanza eucidea totale = " + result.ToString() + " diviso le unità " + ( result/  float arrayTimed.Length ).ToString())
         if (result / float listacorta.Length) < tolleranza 
-                                                        then System.Console.WriteLine("canae")
+                                                        then 
                                                              true
-                                                        else false 
+                                                        else 
+                                                            false 
 
     ///<summary>
     ///Fa sampling sull'input restituendo un nuovo oggetto BufferedData 
@@ -398,7 +395,7 @@ type Buffered1D<'T> (?item:List<TData1D<'T>>, ?soglia:float) =
             let x = new Buffered1D<'T>(new List<TData1D<'T>>(finallist))
             x
         else
-            this // decidere se restituire qualcos'altro
+            this 
 
 type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
     inherit BufferedData<TData2D<'T>>()
@@ -496,10 +493,7 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
     member this.TotalDistance(timespan:float) = 
             
             let mutable datacp = listcut(itemlist, timespan)
-            
-    //        Console.WriteLine("lunghezza itemlist -> " + (Seq.length itemlist).ToString())
-    //        Console.WriteLine("lunghezza datacp -> " + (Seq.length datacp).ToString())    
-              
+             
             if (Seq.length datacp >2)
                 then
                     let mutable current = datacp.Head
@@ -513,7 +507,7 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
 
                     distance
                 else
-                    0.0 // TODO : Decidere cosa fare x quando non ho dettagli
+                    0.0 
 
 
     ///<summary>
@@ -540,8 +534,7 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
 
                     distanceX,distanceY
                 else
-                    0.0,0.0 // TODO : Decidere cosa fare x quando non ho dettagli
-
+                    0.0,0.0 
 
 
     ///<summary>
@@ -552,10 +545,7 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
     member this.AverageVelocity(timespan:float) = 
             
             let datacp = listcut(itemlist, timespan)
-            
-    //        Console.WriteLine("lunghezza itemlist -> " + (Seq.length itemlist).ToString())
-    //        Console.WriteLine("lunghezza datacp -> " + (Seq.length datacp).ToString())    
-              
+                   
             if (Seq.length datacp >2)
                 then
                     let startingtime = datacp.Head.Time
@@ -565,8 +555,7 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
                     let velocity = (distance / (lasttime - startingtime).TotalMilliseconds)*1000.0
                     velocity   
                 else
-                    0.0 // TODO : Decidere cosa fare x quando non ho dettagli
-
+                    0.0 
  
     ///<summary>
     ///Calcola la accelerazione ottenuta comparando la velocità ottenuta nella parte tra start e mid con quella da mid al momento attuale
@@ -703,7 +692,6 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
             arrayTimed
             |> Seq.map (fun f -> Math.Sqrt( sqr(disteuclidea(coeff.[0],vnoto.[0],f.D1,f.Time))+sqr(disteuclidea(coeff.[1],vnoto.[1],f.D2,f.Time))))  // radice quadrata del quadrato delle distanze x dimensione
             |> Seq.sum 
-        System.Console.WriteLine("Distanza eucidea totale = " + result.ToString() + " diviso le unità " + ( result /  float arrayTimed.Length ).ToString())
         if (result / float listacorta.Length) < tolleranza 
                                                         then true
                                                         else false 
@@ -726,7 +714,6 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
             Listavalori
             |> Seq.map (fun f -> disteuclidea(coeff,vnoto,f.D2,f.D1))  // radice quadrata del quadrato delle distanze x dimensione
 
-//        System.Console.WriteLine("Distanza eucidea totale = " + result.ToString() + " diviso le unità " + ( result /  float arrayTimed.Length ).ToString())
         Seq.forall(fun x -> ( x < tolleranza) )  result 
 
     member this.Sample(funzione:(TData2D<'T> -> bool)) = 
@@ -776,7 +763,7 @@ type Buffered2D<'T> (?item:List<TData2D<'T>>, ?soglia:float) =
             let x = new Buffered2D<'T>(new List<TData2D<'T>>(finallist))
             x
         else
-            this // decidere se restituire qualcos'altro
+            this 
 
 
 type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
@@ -866,10 +853,7 @@ type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
     member this.TotalDistance(timespan:float) = 
             
             let mutable datacp = listcut(itemlist, timespan)
-            
-    //        Console.WriteLine("lunghezza itemlist -> " + (Seq.length itemlist).ToString())
-    //        Console.WriteLine("lunghezza datacp -> " + (Seq.length datacp).ToString())    
-              
+             
             if (Seq.length datacp >2)
                 then
                     let mutable current = datacp.Head
@@ -883,7 +867,7 @@ type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
 
                     distance
                 else
-                    0.0 // TODO : Decidere cosa fare x quando non ho dettagli
+                    0.0 
 
 
     ///<summary>
@@ -913,8 +897,7 @@ type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
 
                     distanceX,distanceY,distanceZ
                 else
-                    0.0,0.0,0.0 // TODO : Decidere cosa fare x quando non ho dettagli
-
+                    0.0,0.0,0.0 
 
 
 
@@ -936,10 +919,7 @@ type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
     member this.AverageVelocity(timespan:float) = 
             
             let mutable datacp = listcut(itemlist, timespan)
-            
-    //        Console.WriteLine("lunghezza itemlist -> " + (Seq.length itemlist).ToString())
-    //        Console.WriteLine("lunghezza datacp -> " + (Seq.length datacp).ToString())    
-              
+                
             if (Seq.length datacp >2)
                 then
                     let startingtime = datacp.Head.Time
@@ -949,9 +929,8 @@ type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
                     let velocity = (distance / (lasttime - startingtime).TotalMilliseconds)*1000.0
                     velocity   
                 else
-                    0.0 // TODO : Decidere cosa fare x quando non ho dettagli
+                    0.0 
 
- 
     ///<summary>
     ///Calcola la accelerazione ottenuta comparando la velocità ottenuta nella parte tra start e mid con quella da mid al momento attuale
     ///</summary>
@@ -1106,7 +1085,7 @@ type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
             arrayTimed
             |> Seq.map (fun f -> Math.Sqrt( sqr(disteuclidea(coeff.[0],vnoto.[0],f.D1,f.Time))+sqr(disteuclidea(coeff.[1],vnoto.[1],f.D2,f.Time))+sqr(disteuclidea(coeff.[2],vnoto.[2],f.D3,f.Time))))  // radice quadrata del quadrato delle distanze x dimensione
             |> Seq.sum 
-        System.Console.WriteLine("Distanza eucidea totale = " + result.ToString() + " diviso le unità " + ( result /  float arrayTimed.Length ).ToString())
+ 
         if (result / float listacorta.Length) < tolleranza 
                                                         then true
                                                         else false 
@@ -1161,4 +1140,4 @@ type Buffered3D<'T> (?item:List<TData3D<'T>>, ?soglia:float) =
             let x = new Buffered3D<'T>(new List<TData3D<'T>>(finallist))
             x
         else
-            this // decidere se restituire qualcos'altro
+            this

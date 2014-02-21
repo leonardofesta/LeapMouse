@@ -31,6 +31,8 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.bExit = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.lBottom = new System.Windows.Forms.Label();
+            this.lTop = new System.Windows.Forms.Label();
             this.lRight = new System.Windows.Forms.Label();
             this.lLeft = new System.Windows.Forms.Label();
             this.bHide = new System.Windows.Forms.Button();
@@ -38,8 +40,6 @@
             this.bCalibrate = new System.Windows.Forms.Button();
             this.LStatus = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.lTop = new System.Windows.Forms.Label();
-            this.lBottom = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -73,6 +73,7 @@
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.LightBlue;
+            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel2.Controls.Add(this.lBottom);
             this.panel2.Controls.Add(this.lTop);
             this.panel2.Controls.Add(this.lRight);
@@ -82,11 +83,31 @@
             this.panel2.Size = new System.Drawing.Size(261, 116);
             this.panel2.TabIndex = 5;
             // 
+            // lBottom
+            // 
+            this.lBottom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.lBottom.AutoSize = true;
+            this.lBottom.Location = new System.Drawing.Point(113, 89);
+            this.lBottom.Name = "lBottom";
+            this.lBottom.Size = new System.Drawing.Size(19, 13);
+            this.lBottom.TabIndex = 3;
+            this.lBottom.Text = "25";
+            this.lBottom.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+            // 
+            // lTop
+            // 
+            this.lTop.AutoSize = true;
+            this.lTop.Location = new System.Drawing.Point(115, 9);
+            this.lTop.Name = "lTop";
+            this.lTop.Size = new System.Drawing.Size(25, 13);
+            this.lTop.TabIndex = 2;
+            this.lTop.Text = "800";
+            // 
             // lRight
             // 
             this.lRight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lRight.AutoSize = true;
-            this.lRight.Location = new System.Drawing.Point(233, 52);
+            this.lRight.Location = new System.Drawing.Point(231, 50);
             this.lRight.Name = "lRight";
             this.lRight.Size = new System.Drawing.Size(25, 13);
             this.lRight.TabIndex = 1;
@@ -147,31 +168,14 @@
             // 
             // pictureBox1
             // 
+            this.pictureBox1.Image = global::LeapMouse.GUI.Properties.Resources.green;
+            this.pictureBox1.InitialImage = global::LeapMouse.GUI.Properties.Resources.green;
             this.pictureBox1.Location = new System.Drawing.Point(24, 22);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(72, 22);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
-            // 
-            // lTop
-            // 
-            this.lTop.AutoSize = true;
-            this.lTop.Location = new System.Drawing.Point(115, 9);
-            this.lTop.Name = "lTop";
-            this.lTop.Size = new System.Drawing.Size(25, 13);
-            this.lTop.TabIndex = 2;
-            this.lTop.Text = "800";
-            // 
-            // lBottom
-            // 
-            this.lBottom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.lBottom.AutoSize = true;
-            this.lBottom.Location = new System.Drawing.Point(115, 91);
-            this.lBottom.Name = "lBottom";
-            this.lBottom.Size = new System.Drawing.Size(19, 13);
-            this.lBottom.TabIndex = 3;
-            this.lBottom.Text = "25";
-            this.lBottom.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
             // Form1
             // 

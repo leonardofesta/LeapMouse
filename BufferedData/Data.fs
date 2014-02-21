@@ -30,8 +30,9 @@ type Acc1D<'T> when 'T:null() =
     let mutable variance = -1.0
     let mutable x2 = 0.0 // sarebbe x^2
     let mutable stdev = -1.0
-    let mutable info:'T = null 
+    let mutable info:'T = null
     let mutable last = -1.0
+    let mutable sndlast = -1.0
 
     override this.AddItem(d,filter) = 
             if ( filter d ) then this.AddItem(d)
@@ -44,7 +45,8 @@ type Acc1D<'T> when 'T:null() =
             items <- (items+1 )
             variance <- x2 - (avg * avg)
             stdev <- Math.Sqrt  variance
-            info <- d.Info 
+            info <- d.Info
+            sndlast <- last 
             last <- d.D1
 
     member this.Info() = 
@@ -62,6 +64,7 @@ type Acc1D<'T> when 'T:null() =
             variance <- -1.0
             x2 <- 0.0
             stdev <- -1.0
+            sndlast <- -1.0
             last <- -1.0
 
     interface NumericData<Data1D<'T>,'T> with 
@@ -69,6 +72,11 @@ type Acc1D<'T> when 'T:null() =
         member this.Last
                 with get() = {new Data1D<'T> with
                                   member this.D1 = last 
+                                  member this.Info = info
+                                  }
+         member this.SecondLast
+                with get() = {new Data1D<'T> with
+                                  member this.D1 = sndlast 
                                   member this.Info = info
                                   }
         member this.Sum 
@@ -118,6 +126,8 @@ type Acc2D<'T> when 'T:null() =
     let mutable info:'T = null 
     let mutable last1 = -1.0
     let mutable last2 = -1.0
+    let mutable sndlast1 = -1.0
+    let mutable sndlast2 = -1.0
 
     override this.AddItem(d,filter) = 
             if ( filter d ) then this.AddItem(d)
@@ -138,6 +148,8 @@ type Acc2D<'T> when 'T:null() =
             stdev1 <- Math.Sqrt variance1
             stdev2 <- Math.Sqrt variance2
             info <- d.Info
+            sndlast1 <- last1
+            sndlast2 <- last2
             last1 <- d.D1
             last2 <- d.D2
 
@@ -158,6 +170,8 @@ type Acc2D<'T> when 'T:null() =
             x2_2 <- 0.0
             stdev1 <- -1.0
             stdev2 <- -1.0
+            sndlast1 <- -1.0
+            sndlast2 <- -1.0 
             last1 <- -1.0
             last2 <- -1.0
 
@@ -170,6 +184,12 @@ type Acc2D<'T> when 'T:null() =
                                     member this.Info = info
                                     } 
 
+        member this.SecondLast
+                with get() =  { new Data2D<'T> with 
+                                    member this.D1 = sndlast1 
+                                    member this.D2 = sndlast2
+                                    member this.Info = info
+                                    } 
         member this.Sum 
                 with get() =  { new Data2D<'T> with 
                                     member this.D1 = sum1 
@@ -228,6 +248,9 @@ type Acc3D<'T> when 'T:null() =
     let mutable last1 = -1.0
     let mutable last2 = -1.0
     let mutable last3 = -1.0
+    let mutable sndlast1 = -1.0
+    let mutable sndlast2 = -1.0
+    let mutable sndlast3 = -1.0
 
     override this.AddItem(d,filter) = 
             if ( filter d ) then this.AddItem(d)    
@@ -257,6 +280,10 @@ type Acc3D<'T> when 'T:null() =
             stdev3 <- Math.Sqrt variance3
 
             info <- d.Info
+
+            sndlast1 <- last1
+            sndlast2 <- last2
+            sndlast3 <- last3
             last1 <- d.D1
             last2 <- d.D2
             last3 <- d.D3
@@ -284,6 +311,9 @@ type Acc3D<'T> when 'T:null() =
             stdev1 <- -1.0
             stdev2 <- -1.0
             stdev3 <- -1.0
+            sndlast1 <- -1.0
+            sndlast2 <- -1.0            
+            sndlast3 <- -1.0
             last1 <- -1.0
             last2 <- -1.0
             last3 <- -1.0
@@ -296,6 +326,14 @@ type Acc3D<'T> when 'T:null() =
                                     member x.D1 = last1 
                                     member x.D2 = last2
                                     member x.D3 = last3
+                                    member x.Info = info
+                                    } 
+
+         member x.SecondLast
+                with get() =  { new Data3D<'T> with 
+                                    member x.D1 = sndlast1 
+                                    member x.D2 = sndlast2
+                                    member x.D3 = sndlast3
                                     member x.Info = info
                                     } 
 

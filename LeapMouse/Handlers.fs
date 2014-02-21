@@ -33,12 +33,10 @@ let nomod_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.Even
        controller.Modify(false)
        controller.ClosePopupCalibration3()
        controller.SetDesktopCoordinates()
-       System.Console.WriteLine("stop modifiche per calibrazione")
 
 let setcalibratingfinger_h (controller:LMController) (sender:_,f:LeapFeatureTypes,e:System.EventArgs) = 
        let ee = e:?> LeapSensorEventArgs
        controller.SetCalibratingFinger(ee.ActivityFingers.Head.Id)
-       System.Console.WriteLine("stiamo settando il dito")
        controller.OpenPopupCalibration1()
 
 // Mouse simulating handlers net 
